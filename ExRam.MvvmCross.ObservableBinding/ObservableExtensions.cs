@@ -8,7 +8,7 @@ using Cirrious.CrossCore.Core;
 
 namespace System.Reactive.Linq
 {
-    public static class ObservableExtensions
+    public static partial class ObservableExtensions
     {
         public static IObservable<T> ObserveOn<T>(this IObservable<T> source, IMvxMainThreadDispatcher dispatcher)
         {
@@ -18,7 +18,7 @@ namespace System.Reactive.Linq
             return Observable.Create<T>((observer) => source.Subscribe(
                 (value) => dispatcher.RequestMainThreadAction(() => observer.OnNext(value)),
                 (ex) => dispatcher.RequestMainThreadAction(() => observer.OnError(ex)),
-                () => dispatcher.RequestMainThreadAction(() => observer.OnCompleted())));
+                () => dispatcher.RequestMainThreadAction(observer.OnCompleted)));
         }
     }
 }

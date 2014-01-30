@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Reflection;
 using Cirrious.MvvmCross.Binding;
 using Cirrious.MvvmCross.Binding.Bindings.Source;
@@ -26,23 +27,25 @@ namespace ExRam.MvvmCross.ObservableBinding
                                    ? ((BindingToObservableWrapper)source).SourceType.GetTypeInfo().GenericTypeArguments[0]
                                    : typeof(object);
 
-            this._subscription = source.Subscribe(value =>
-            {
-                this._currentValue = value;
-
-                if (this._currentSubBinding != null)
+            this._subscription = source
+                .ToWeakObservable()
+                .Subscribe(value =>
                 {
-                    this._currentSubBinding.Dispose();
-                    this._currentSubBinding = null;
-                }
+                    this._currentValue = value;
 
-                if ((remainingTokens != null) && (remainingTokens.Count > 0))
-                    this._currentSubBinding = MvxBindingSingletonCache.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
+                    if (this._currentSubBinding != null)
+                    {
+                        this._currentSubBinding.Dispose();
+                        this._currentSubBinding = null;
+                    }
 
-                var changed = this.Changed;
-                if (changed != null)
-                    changed(this, EventArgs.Empty);
-            });
+                    if ((remainingTokens != null) && (remainingTokens.Count > 0))
+                        this._currentSubBinding = MvxBindingSingletonCache.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
+
+                    var changed = this.Changed;
+                    if (changed != null)
+                        changed(this, EventArgs.Empty);
+                });
         }
 
         public object GetValue()
