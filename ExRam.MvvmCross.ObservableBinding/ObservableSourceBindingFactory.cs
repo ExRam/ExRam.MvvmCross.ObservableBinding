@@ -39,10 +39,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         private IMvxSourceBinding Check(IMvxSourceBinding binding)
         {
             if (typeof(IObservable<object>).GetTypeInfo().IsAssignableFrom(binding.SourceType.GetTypeInfo()))
-            {
-                return new ObservableMvxSourceBinding(
-                    new BindingToObservableWrapper(binding), null);
-            }
+                return new ObservableMvxSourceBinding(new BindingToObservableWrapper(binding), null);
 
             return binding;
         }
