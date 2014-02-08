@@ -4,6 +4,8 @@
 using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
 using Cirrious.CrossCore;
 using Cirrious.MvvmCross.Binding;
 using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
@@ -24,6 +26,16 @@ namespace ExRam.MvvmCross.ObservableBinding
                 get
                 {
                     return "Hello";
+                }
+            }
+
+            public IObservable<string> StringObservable
+            {
+                get
+                {
+                    return Observable
+                        .Interval(TimeSpan.FromMilliseconds(100))
+                        .Select(x => x.ToString());
                 }
             }
         }
@@ -161,6 +173,26 @@ namespace ExRam.MvvmCross.ObservableBinding
 
             Assert.AreEqual(typeof(string), binding.SourceType);
             Assert.AreEqual("Hello", binding.GetValue());
+        }
+
+        [TestMethod]
+        public async Task Binding_to_Foo_NestedBarObservable_produces_correct_values()
+        {
+            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var binding = factory.CreateBinding(new Foo(), "NestedBarObservable.StringObservable");
+
+            Assert.AreEqual(typeof(string), binding.SourceType);
+
+            var array = await Observable.FromEventPattern<EventHandler, EventArgs>((eh) => binding.Changed += eh, (eh) => binding.Changed -= eh)
+                .Select(x => binding.GetValue())
+                .Take(10)
+                .ToArray()
+                .ToTask();
+
+            for (var i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(i.ToString(), array[i]);
+            }
         }
 
         [TestMethod]
