@@ -2,6 +2,8 @@
 // ExRam.MvvmCross.ObservableBinding is licensed using Microsoft Public License (Ms-PL)
 
 using System;
+using System.Diagnostics;
+using System.Reactive;
 using System.Reactive.Linq;
 using Cirrious.MvvmCross.Binding.Bindings.Source;
 
@@ -17,10 +19,11 @@ namespace ExRam.MvvmCross.ObservableBinding
             this._baseBinding = baseBinding;
 
             this._innerObservable = Observable
-                .Defer(() => Observable.Return(baseBinding.GetValue()))
+                .Return<object>(null)
                 .Concat(Observable
-                    .FromEventPattern((eh) => this._baseBinding.Changed += eh, (eh) => this._baseBinding.Changed -= eh))
-                .Select(x => (baseBinding.GetValue() as IObservable<object>) ?? Observable.Return<IObservable<object>>(null))
+                    .FromEventPattern((eh) => baseBinding.Changed += eh, (eh) => baseBinding.Changed -= eh))
+                .Select(x => baseBinding.GetValue())
+                .Select(x => (x as IObservable<object>) ?? Observable.Return<object>(x))
                 .Switch();
         }
 

@@ -15,11 +15,12 @@ namespace ExRam.MvvmCross.ObservableBinding
     {
         public event EventHandler Changed;
 
-        private readonly IDisposable _subscription;
+        private readonly IDisposable _sourceSubscription;
         private readonly Type _sourceType;
 
         private object _currentValue;
         private IMvxSourceBinding _currentSubBinding;
+        private IDisposable _currentSubBindingSubscription;
 
         public ObservableMvxSourceBinding(IObservable<object> source, List<MvxPropertyToken> remainingTokens)
         {
@@ -27,7 +28,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                                    ? ((BindingToObservableWrapper)source).SourceType.GetTypeInfo().GenericTypeArguments[0]
                                    : typeof(object);
 
-            this._subscription = source
+            this._sourceSubscription = source
                 .ToWeakObservable()
                 .Subscribe(value =>
                 {
@@ -39,12 +40,22 @@ namespace ExRam.MvvmCross.ObservableBinding
                         this._currentSubBinding = null;
                     }
 
+                    if (this._currentSubBindingSubscription != null)
+                    {
+                        this._currentSubBindingSubscription.Dispose();
+                        this._currentSubBindingSubscription = null;
+                    }
+
                     if ((remainingTokens != null) && (remainingTokens.Count > 0))
                         this._currentSubBinding = MvxBindingSingletonCache.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
-
-                    var changed = this.Changed;
-                    if (changed != null)
-                        changed(this, EventArgs.Empty);
+                     
+                    this._currentSubBindingSubscription = ((this._currentSubBinding != null) ? (new BindingToObservableWrapper(this._currentSubBinding)) : (Observable.Return<object>(null)))
+                        .Subscribe((value2 => 
+                        {
+                            var changed2 = this.Changed;
+                            if (changed2 != null)
+                                changed2(this, EventArgs.Empty);
+                        }));
                 });
         }
 
@@ -66,7 +77,10 @@ namespace ExRam.MvvmCross.ObservableBinding
             if (this._currentSubBinding != null)
                 this._currentSubBinding.Dispose();
 
-            this._subscription.Dispose();
+            if (this._currentSubBindingSubscription != null)
+                this._currentSubBindingSubscription.Dispose();
+
+            this._sourceSubscription.Dispose();
         }
 
         public Type SourceType
