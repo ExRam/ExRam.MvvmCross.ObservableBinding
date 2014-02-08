@@ -36,7 +36,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 //Either
                 // - source is an IObservable. Then, propertyToken must not be looked up on source itself
                 //   but rather on the elements that come out of the IObservable.
-                // - source is not an Observable. Then IMvxSourceBindingFactory.CreateBinding needs
+                // - source is not an IObservable. Then IMvxSourceBindingFactory.CreateBinding needs
                 //   the list of [propertyToken | remainingTokens].
                 if (!(propertyToken is MvxEmptyPropertyToken))
                 {
@@ -45,10 +45,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 }
 
                 if (observable != null)
-                {
                     result = new ObservableMvxSourceBinding(observable, remainingTokens);
-                    return true;
-                }
                 else
                 {
                     //Recursively call IMvxSourceBindingFactory.CreateBinding(source, remainingTokens).
@@ -67,9 +64,9 @@ namespace ExRam.MvvmCross.ObservableBinding
 
                     if (typeof(IObservable<object>).GetTypeInfo().IsAssignableFrom(result.SourceType.GetTypeInfo()))
                         result = new ObservableMvxSourceBinding(new BindingToObservableWrapper(result), null);
-
-                    return true;
                 }
+
+                return true;
             }
         }
     }
