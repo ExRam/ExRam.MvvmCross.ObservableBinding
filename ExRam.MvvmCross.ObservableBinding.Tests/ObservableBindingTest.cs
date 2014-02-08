@@ -108,9 +108,13 @@ namespace ExRam.MvvmCross.ObservableBinding
         {
             base.Setup();
 
-            var factory = new ObservableSourceBindingFactory(new MvxSourceBindingFactory())
+            var factory = new MvxSourceBindingFactory()
             {
-                Extensions = { new MvxPropertySourceBindingFactoryExtension() }
+                Extensions = 
+                {
+                    new ObservableMvxPropertySourceBindingFactoryExtension(),
+                    new MvxPropertySourceBindingFactoryExtension() 
+                }
             };
 
             base.Ioc.RegisterSingleton<IMvxSourceBindingFactory>(factory);

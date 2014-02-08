@@ -45,7 +45,6 @@
     <Compile Include="BindingToObservableWrapper.cs" />
     <Compile Include="ObservableExtensions.cs" />
     <Compile Include="ObservableMvxSourceBinding.cs" />
-    <Compile Include="ObservableSourceBindingFactory.cs" />
     <Compile Include="ObservableMvxPropertySourceBindingFactoryExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
