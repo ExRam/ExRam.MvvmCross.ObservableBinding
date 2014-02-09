@@ -35,12 +35,6 @@ namespace ExRam.MvvmCross.ObservableBinding
                 return false;
             }
 
-            return TryCreateObservableBinding(source, remainingTokens, out result, propertyInfo);
-        }
-
-        protected bool TryCreateObservableBinding(object source, List<MvxPropertyToken> remainingTokens,
-                                                  out IMvxSourceBinding result, PropertyInfo propertyInfo)
-        {
             var value = propertyInfo.GetValue(source, new object[0]) as IObservable<object>;
             if (value == null)
             {
