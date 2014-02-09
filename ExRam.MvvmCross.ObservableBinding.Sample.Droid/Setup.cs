@@ -17,7 +17,7 @@ namespace ExRam.MvvmCross.ObservableBinding.Sample
         {
             base.InitializeLastChance();
 
-            Mvx.Resolve<IMvxSourceBindingFactoryExtensionHost>().Extensions.Insert(0, new ObservableMvxPropertySourceBindingFactoryExtension());
+            Mvx.Resolve<IMvxSourceBindingFactoryExtensionHost>().Extensions.Insert(0, new OldSkoolObsevableExtension());
         }
 
         protected override IMvxApplication CreateApp()

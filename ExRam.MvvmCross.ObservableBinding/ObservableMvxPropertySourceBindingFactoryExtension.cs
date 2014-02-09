@@ -2,9 +2,10 @@
 // ExRam.MvvmCross.ObservableBinding is licensed using Microsoft Public License (Ms-PL)
 
 using System;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Reflection;
 using Cirrious.CrossCore;
+using Cirrious.MvvmCross.Binding;
 using Cirrious.MvvmCross.Binding.Bindings.Source;
 using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
 using Cirrious.MvvmCross.Binding.Parse.PropertyPath.PropertyTokens;
