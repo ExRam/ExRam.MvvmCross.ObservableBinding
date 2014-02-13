@@ -24,9 +24,7 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         public ObservableMvxSourceBinding(IObservable<object> source, Type sourceType, List<MvxPropertyToken> remainingTokens)
         {
-            this._sourceType = sourceType;/* source is BindingToObservableWrapper
-                                   ? ((BindingToObservableWrapper)source).SourceType.GetTypeInfo().GenericTypeArguments[0]
-                                   : source.GetType().GetTypeInfo().ImplementedInterfaces.First(x => x. .GenericTypeArguments[0];*/
+            this._sourceType = sourceType;
 
             this._sourceSubscription = source
                 .ToWeakObservable()
@@ -46,16 +44,28 @@ namespace ExRam.MvvmCross.ObservableBinding
                         this._currentSubBindingSubscription = null;
                     }
 
+                    IMvxSourceBinding newSubBinding = null;
                     if ((remainingTokens != null) && (remainingTokens.Count > 0))
-                        this._currentSubBinding = MvxBindingSingletonCache.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
-                     
-                    this._currentSubBindingSubscription = ((this._currentSubBinding != null) ? (new BindingToObservableWrapper(this._currentSubBinding)) : (Observable.Return<object>(null)))
-                        .Subscribe((value2 => 
-                        {
-                            var changed2 = this.Changed;
-                            if (changed2 != null)
-                                changed2(this, EventArgs.Empty);
-                        }));
+                        newSubBinding = MvxBindingSingletonCache.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
+
+                    var subBindingObservable = (newSubBinding != null)
+                        ? Observable
+                            .Return<object>(null)
+                            .Concat(Observable
+                                .FromEventPattern((eh) => newSubBinding.Changed += eh, (eh) => newSubBinding.Changed -= eh))
+                            .Select(x => newSubBinding.GetValue())
+                            .Select(x => (x as IObservable<object>) ?? Observable.Return<object>(x))
+                            .Switch()
+                        : Observable.Return<object>(null);
+
+                    this._currentSubBindingSubscription = subBindingObservable.Subscribe((value2 => 
+                    {
+                        var changed2 = this.Changed;
+                        if (changed2 != null)
+                            changed2(this, EventArgs.Empty);
+                    }));
+
+                    this._currentSubBinding = newSubBinding;
                 });
         }
 
@@ -69,7 +79,6 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         public void SetValue(object value)
         {
-            //Cannot possibly set a field of type IObservable<>?
         }
 
         public void Dispose()
