@@ -58,14 +58,14 @@ namespace ExRam.MvvmCross.ObservableBinding
                             .Switch()
                         : Observable.Return<object>(null);
 
+                    this._currentSubBinding = newSubBinding;
+
                     this._currentSubBindingSubscription = subBindingObservable.Subscribe((value2 => 
                     {
                         var changed2 = this.Changed;
                         if (changed2 != null)
                             changed2(this, EventArgs.Empty);
                     }));
-
-                    this._currentSubBinding = newSubBinding;
                 });
         }
 

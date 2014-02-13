@@ -21,11 +21,26 @@ namespace ExRam.MvvmCross.ObservableBinding
         #region Bar
         private sealed class Bar
         {
+            private readonly int _value;
+
+            public Bar(int value)
+            {
+                this._value = value;
+            }
+
             public string BarProperty
             {
                 get
                 {
                     return "Hello";
+                }
+            }
+
+            public int Value
+            {
+                get
+                {
+                    return this._value;
                 }
             }
 
@@ -80,8 +95,19 @@ namespace ExRam.MvvmCross.ObservableBinding
             {
                 get
                 {
-                    return Observable.Return(new Bar());
+                    return Observable.Return(new Bar(0));
                 }
+            }
+
+            public IObservable<Bar> DynamicNestedBarObservable
+            {
+                get
+                {
+                    return Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1)).Select(x => new Bar((int)x));
+
+                    //return Observable.Range(0, 10).Select(x => new Bar(x));
+                }
+
             }
         }
         #endregion
@@ -192,6 +218,26 @@ namespace ExRam.MvvmCross.ObservableBinding
             for (var i = 0; i < 10; i++)
             {
                 Assert.AreEqual(i.ToString(), array[i]);
+            }
+        }
+
+        [TestMethod]
+        public async Task Binding_to_Foo_DynamicNestedBarObservable_Calue_produces_correct_values()
+        {
+            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var binding = factory.CreateBinding(new Foo(), "DynamicNestedBarObservable.Value");
+
+            Assert.AreEqual(typeof(int), binding.SourceType);
+
+            var array = await Observable.FromEventPattern<EventHandler, EventArgs>((eh) => binding.Changed += eh, (eh) => binding.Changed -= eh)
+                .Select(x => binding.GetValue())
+                .Take(10)
+                .ToArray()
+                .ToTask();
+
+            for (var i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(i, array[i]);
             }
         }
 
