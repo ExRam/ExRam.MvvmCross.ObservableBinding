@@ -103,9 +103,7 @@ namespace ExRam.MvvmCross.ObservableBinding
             {
                 get
                 {
-                    return Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1)).Select(x => new Bar((int)x));
-
-                    //return Observable.Range(0, 10).Select(x => new Bar(x));
+                    return Observable.Interval(TimeSpan.FromMilliseconds(100)).Select(x => new Bar((int)x));
                 }
 
             }
@@ -222,12 +220,10 @@ namespace ExRam.MvvmCross.ObservableBinding
         }
 
         [TestMethod]
-        public async Task Binding_to_Foo_DynamicNestedBarObservable_Calue_produces_correct_values()
+        public async Task Binding_to_Foo_DynamicNestedBarObservable_Value_produces_correct_values()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "DynamicNestedBarObservable.Value");
-
-            Assert.AreEqual(typeof(int), binding.SourceType);
 
             var array = await Observable.FromEventPattern<EventHandler, EventArgs>((eh) => binding.Changed += eh, (eh) => binding.Changed -= eh)
                 .Select(x => binding.GetValue())
