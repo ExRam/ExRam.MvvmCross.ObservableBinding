@@ -22,11 +22,11 @@ namespace ExRam.MvvmCross.ObservableBinding
         private IMvxSourceBinding _currentSubBinding;
         private IDisposable _currentSubBindingSubscription;
 
-        public ObservableMvxSourceBinding(IObservable<object> source, List<MvxPropertyToken> remainingTokens)
+        public ObservableMvxSourceBinding(IObservable<object> source, Type sourceType, List<MvxPropertyToken> remainingTokens)
         {
-            this._sourceType = source is BindingToObservableWrapper
+            this._sourceType = sourceType;/* source is BindingToObservableWrapper
                                    ? ((BindingToObservableWrapper)source).SourceType.GetTypeInfo().GenericTypeArguments[0]
-                                   : typeof(object);
+                                   : source.GetType().GetTypeInfo().ImplementedInterfaces.First(x => x. .GenericTypeArguments[0];*/
 
             this._sourceSubscription = source
                 .ToWeakObservable()
