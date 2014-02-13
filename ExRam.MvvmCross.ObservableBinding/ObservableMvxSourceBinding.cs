@@ -11,7 +11,7 @@ using Cirrious.MvvmCross.Binding.Parse.PropertyPath.PropertyTokens;
 
 namespace ExRam.MvvmCross.ObservableBinding
 {
-    public sealed class ObservableMvxSourceBinding : IMvxSourceBinding
+    internal sealed class ObservableMvxSourceBinding : IMvxSourceBinding
     {
         public event EventHandler Changed;
 
