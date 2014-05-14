@@ -4,6 +4,8 @@
 using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
 using Cirrious.CrossCore;
 using Cirrious.MvvmCross.Binding;
 using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
@@ -19,11 +21,36 @@ namespace ExRam.MvvmCross.ObservableBinding
         #region Bar
         private sealed class Bar
         {
+            private readonly int _value;
+
+            public Bar(int value)
+            {
+                this._value = value;
+            }
+
             public string BarProperty
             {
                 get
                 {
                     return "Hello";
+                }
+            }
+
+            public int Value
+            {
+                get
+                {
+                    return this._value;
+                }
+            }
+
+            public IObservable<string> StringObservable
+            {
+                get
+                {
+                    return Observable
+                        .Interval(TimeSpan.FromMilliseconds(100))
+                        .Select(x => x.ToString());
                 }
             }
         }
@@ -68,8 +95,17 @@ namespace ExRam.MvvmCross.ObservableBinding
             {
                 get
                 {
-                    return Observable.Return(new Bar());
+                    return Observable.Return(new Bar(0));
                 }
+            }
+
+            public IObservable<Bar> DynamicNestedBarObservable
+            {
+                get
+                {
+                    return Observable.Interval(TimeSpan.FromMilliseconds(100)).Select(x => new Bar((int)x));
+                }
+
             }
         }
         #endregion
@@ -108,9 +144,13 @@ namespace ExRam.MvvmCross.ObservableBinding
         {
             base.Setup();
 
-            var factory = new ObservableSourceBindingFactory(new MvxSourceBindingFactory())
+            var factory = new MvxSourceBindingFactory()
             {
-                Extensions = { new MvxPropertySourceBindingFactoryExtension() }
+                Extensions = 
+                {
+                    new ObservableMvxPropertySourceBindingFactoryExtension(),
+                    new MvxPropertySourceBindingFactoryExtension() 
+                }
             };
 
             base.Ioc.RegisterSingleton<IMvxSourceBindingFactory>(factory);
@@ -157,6 +197,44 @@ namespace ExRam.MvvmCross.ObservableBinding
 
             Assert.AreEqual(typeof(string), binding.SourceType);
             Assert.AreEqual("Hello", binding.GetValue());
+        }
+
+        [TestMethod]
+        public async Task Binding_to_Foo_NestedBarObservable_produces_correct_values()
+        {
+            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var binding = factory.CreateBinding(new Foo(), "NestedBarObservable.StringObservable");
+
+            Assert.AreEqual(typeof(string), binding.SourceType);
+
+            var array = await Observable.FromEventPattern<EventHandler, EventArgs>((eh) => binding.Changed += eh, (eh) => binding.Changed -= eh)
+                .Select(x => binding.GetValue())
+                .Take(10)
+                .ToArray()
+                .ToTask();
+
+            for (var i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(i.ToString(), array[i]);
+            }
+        }
+
+        [TestMethod]
+        public async Task Binding_to_Foo_DynamicNestedBarObservable_Value_produces_correct_values()
+        {
+            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var binding = factory.CreateBinding(new Foo(), "DynamicNestedBarObservable.Value");
+
+            var array = await Observable.FromEventPattern<EventHandler, EventArgs>((eh) => binding.Changed += eh, (eh) => binding.Changed -= eh)
+                .Select(x => binding.GetValue())
+                .Take(10)
+                .ToArray()
+                .ToTask();
+
+            for (var i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(i, array[i]);
+            }
         }
 
         [TestMethod]

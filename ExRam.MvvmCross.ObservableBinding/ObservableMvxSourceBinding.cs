@@ -11,23 +11,22 @@ using Cirrious.MvvmCross.Binding.Parse.PropertyPath.PropertyTokens;
 
 namespace ExRam.MvvmCross.ObservableBinding
 {
-    public sealed class ObservableMvxSourceBinding : IMvxSourceBinding
+    internal sealed class ObservableMvxSourceBinding : IMvxSourceBinding
     {
         public event EventHandler Changed;
 
-        private readonly IDisposable _subscription;
+        private readonly IDisposable _sourceSubscription;
         private readonly Type _sourceType;
 
         private object _currentValue;
         private IMvxSourceBinding _currentSubBinding;
+        private IDisposable _currentSubBindingSubscription;
 
-        public ObservableMvxSourceBinding(IObservable<object> source, List<MvxPropertyToken> remainingTokens)
+        public ObservableMvxSourceBinding(IObservable<object> source, Type sourceType, List<MvxPropertyToken> remainingTokens)
         {
-            this._sourceType = source is BindingToObservableWrapper
-                                   ? ((BindingToObservableWrapper)source).SourceType.GetTypeInfo().GenericTypeArguments[0]
-                                   : typeof(object);
+            this._sourceType = sourceType;
 
-            this._subscription = source
+            this._sourceSubscription = source
                 .ToWeakObservable()
                 .Subscribe(value =>
                 {
@@ -39,12 +38,34 @@ namespace ExRam.MvvmCross.ObservableBinding
                         this._currentSubBinding = null;
                     }
 
-                    if ((remainingTokens != null) && (remainingTokens.Count > 0))
-                        this._currentSubBinding = MvxBindingSingletonCache.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
+                    if (this._currentSubBindingSubscription != null)
+                    {
+                        this._currentSubBindingSubscription.Dispose();
+                        this._currentSubBindingSubscription = null;
+                    }
 
-                    var changed = this.Changed;
-                    if (changed != null)
-                        changed(this, EventArgs.Empty);
+                    IMvxSourceBinding newSubBinding = null;
+                    if ((remainingTokens != null) && (remainingTokens.Count > 0))
+                        newSubBinding = MvxBindingSingletonCache.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
+
+                    var subBindingObservable = (newSubBinding != null)
+                        ? Observable
+                            .Return<object>(null)
+                            .Concat(Observable
+                                .FromEventPattern((eh) => newSubBinding.Changed += eh, (eh) => newSubBinding.Changed -= eh))
+                            .Select(x => newSubBinding.GetValue())
+                            .Select(x => (x as IObservable<object>) ?? Observable.Return<object>(x))
+                            .Switch()
+                        : Observable.Return<object>(null);
+
+                    this._currentSubBinding = newSubBinding;
+
+                    this._currentSubBindingSubscription = subBindingObservable.Subscribe((value2 => 
+                    {
+                        var changed2 = this.Changed;
+                        if (changed2 != null)
+                            changed2(this, EventArgs.Empty);
+                    }));
                 });
         }
 
@@ -58,7 +79,6 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         public void SetValue(object value)
         {
-            //Cannot possibly set a field of type IObservable<>?
         }
 
         public void Dispose()
@@ -66,7 +86,10 @@ namespace ExRam.MvvmCross.ObservableBinding
             if (this._currentSubBinding != null)
                 this._currentSubBinding.Dispose();
 
-            this._subscription.Dispose();
+            if (this._currentSubBindingSubscription != null)
+                this._currentSubBindingSubscription.Dispose();
+
+            this._sourceSubscription.Dispose();
         }
 
         public Type SourceType

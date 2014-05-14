@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExRam.MvvmCross.ObservableBinding", "ExRam.MvvmCross.ObservableBinding\ExRam.MvvmCross.ObservableBinding.csproj", "{DDB09CE6-C906-4E92-98E4-12EC094EC918}"
 EndProject
@@ -13,6 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7F1E0A
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExRam.MvvmCross.ObservableBinding.Sample.Core", "ExRam.MvvmCross.ObservableBinding.Sample.Core\ExRam.MvvmCross.ObservableBinding.Sample.Core.csproj", "{E91C93B1-E045-4F1C-95DF-369ACBD0FC4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExRam.MvvmCross.ObservableBinding.Sample.Droid", "ExRam.MvvmCross.ObservableBinding.Sample.Droid\ExRam.MvvmCross.ObservableBinding.Sample.Droid.csproj", "{1C0F0645-55E1-423C-B74E-1D34BAB39F41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +32,16 @@ Global
 		{D265B567-48D9-406A-80E2-98D007368DC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D265B567-48D9-406A-80E2-98D007368DC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D265B567-48D9-406A-80E2-98D007368DC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E91C93B1-E045-4F1C-95DF-369ACBD0FC4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E91C93B1-E045-4F1C-95DF-369ACBD0FC4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E91C93B1-E045-4F1C-95DF-369ACBD0FC4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E91C93B1-E045-4F1C-95DF-369ACBD0FC4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C0F0645-55E1-423C-B74E-1D34BAB39F41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C0F0645-55E1-423C-B74E-1D34BAB39F41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C0F0645-55E1-423C-B74E-1D34BAB39F41}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{1C0F0645-55E1-423C-B74E-1D34BAB39F41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C0F0645-55E1-423C-B74E-1D34BAB39F41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C0F0645-55E1-423C-B74E-1D34BAB39F41}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
