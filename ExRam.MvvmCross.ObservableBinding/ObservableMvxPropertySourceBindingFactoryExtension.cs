@@ -10,6 +10,8 @@ namespace ExRam.MvvmCross.ObservableBinding
 {
     public class ObservableMvxPropertySourceBindingFactoryExtension : IMvxSourceBindingFactoryExtension
     {
+        private static readonly object[] EmptyObjectArray = new object[0];
+
         public bool TryCreateBinding(object source, MvxPropertyToken currentToken,
                                      List<MvxPropertyToken> remainingTokens, out IMvxSourceBinding result)
         {
@@ -27,24 +29,27 @@ namespace ExRam.MvvmCross.ObservableBinding
             }
 
             var propertyInfo = FindPropertyInfo(source, propertyNameToken.PropertyName);
-
             if (propertyInfo == null)
             {
                 result = null;
                 return false;
             }
 
-            var value = propertyInfo.GetValue(source, new object[0]) as IObservable<object>;
-            if (value == null)
+            var propertyTypeInfo = propertyInfo.PropertyType.GetTypeInfo();
+            if (!((propertyTypeInfo.IsGenericType) && (propertyTypeInfo.GetGenericTypeDefinition() == typeof(IObservable<>))))
             {
                 result = null;
                 return false;
             }
 
-            var propertyTypeInfo = propertyInfo.PropertyType.GetTypeInfo();
-            var elementType = (((propertyTypeInfo.IsGenericType) && (propertyTypeInfo.GetGenericTypeDefinition() == typeof(IObservable<>))) ? (propertyTypeInfo.GenericTypeArguments[0]) : (typeof(object)));
-
-            result = new ObservableMvxSourceBinding(value, elementType, remainingTokens);
+            var value = propertyInfo.GetValue(source, ObservableMvxPropertySourceBindingFactoryExtension.EmptyObjectArray) as IObservable<object>;
+            if (value == null)
+            {
+                result = null;
+                return false;
+            }
+  
+            result = new ObservableMvxSourceBinding(value, propertyTypeInfo.GenericTypeArguments[0], remainingTokens);
             return true;
         }
 
