@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Reflection;
 using Cirrious.MvvmCross.Binding;
 using Cirrious.MvvmCross.Binding.Bindings.Source;
 using Cirrious.MvvmCross.Binding.Parse.PropertyPath.PropertyTokens;
@@ -52,9 +51,9 @@ namespace ExRam.MvvmCross.ObservableBinding
                         ? Observable
                             .Return<object>(null)
                             .Concat(Observable
-                                .FromEventPattern((eh) => newSubBinding.Changed += eh, (eh) => newSubBinding.Changed -= eh))
+                                .FromEventPattern(eh => newSubBinding.Changed += eh, eh => newSubBinding.Changed -= eh))
                             .Select(x => newSubBinding.GetValue())
-                            .Select(x => (x as IObservable<object>) ?? Observable.Return<object>(x))
+                            .Select(x => (x as IObservable<object>) ?? Observable.Return(x))
                             .Switch()
                         : Observable.Return<object>(null);
 
@@ -71,10 +70,9 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         public object GetValue()
         {
-            if (this._currentSubBinding != null)
-                return this._currentSubBinding.GetValue();
-
-            return this._currentValue;
+            return this._currentSubBinding != null
+                ? this._currentSubBinding.GetValue()
+                : this._currentValue;
         }
 
         public void SetValue(object value)

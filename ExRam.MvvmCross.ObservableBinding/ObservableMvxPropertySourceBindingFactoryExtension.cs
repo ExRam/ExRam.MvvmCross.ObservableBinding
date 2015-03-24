@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Cirrious.MvvmCross.Binding.Bindings.Source;
 using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
@@ -28,7 +27,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 return false;
             }
 
-            var propertyInfo = FindPropertyInfo(source, propertyNameToken.PropertyName);
+            var propertyInfo = this.FindPropertyInfo(source, propertyNameToken.PropertyName);
             if (propertyInfo == null)
             {
                 result = null;

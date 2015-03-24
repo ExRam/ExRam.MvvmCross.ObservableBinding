@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
-using Cirrious.CrossCore.Core;
 using Cirrious.MvvmCross.ViewModels;
 
 namespace ExRam.MvvmCross.ObservableBinding.Sample.Core
@@ -19,7 +15,7 @@ namespace ExRam.MvvmCross.ObservableBinding.Sample.Core
                 new CityViewModel("Aachen", TimeSpan.Zero),
                 new CityViewModel("London", TimeSpan.FromHours(-1)),
                 new CityViewModel("New York", TimeSpan.FromHours(-6)),
-                new CityViewModel("Tokio", TimeSpan.FromHours(8)),
+                new CityViewModel("Tokio", TimeSpan.FromHours(8))
             };
         }
 

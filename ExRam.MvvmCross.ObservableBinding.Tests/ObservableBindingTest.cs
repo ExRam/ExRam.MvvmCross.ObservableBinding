@@ -144,7 +144,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         {
             base.Setup();
 
-            var factory = new MvxSourceBindingFactory()
+            var factory = new MvxSourceBindingFactory
             {
                 Extensions = 
                 {
@@ -207,7 +207,7 @@ namespace ExRam.MvvmCross.ObservableBinding
 
             Assert.AreEqual(typeof(string), binding.SourceType);
 
-            var array = await Observable.FromEventPattern<EventHandler, EventArgs>((eh) => binding.Changed += eh, (eh) => binding.Changed -= eh)
+            var array = await Observable.FromEventPattern<EventHandler, EventArgs>(eh => binding.Changed += eh, eh => binding.Changed -= eh)
                 .Select(x => binding.GetValue())
                 .Take(10)
                 .ToArray()
@@ -225,7 +225,7 @@ namespace ExRam.MvvmCross.ObservableBinding
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "DynamicNestedBarObservable.Value");
 
-            var array = await Observable.FromEventPattern<EventHandler, EventArgs>((eh) => binding.Changed += eh, (eh) => binding.Changed -= eh)
+            var array = await Observable.FromEventPattern<EventHandler, EventArgs>(eh => binding.Changed += eh, eh => binding.Changed -= eh)
                 .Select(x => binding.GetValue())
                 .Take(10)
                 .ToArray()

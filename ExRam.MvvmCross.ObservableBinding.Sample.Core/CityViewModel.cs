@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
 using Cirrious.CrossCore.Core;
-using Cirrious.MvvmCross.ViewModels;
 
 namespace ExRam.MvvmCross.ObservableBinding.Sample.Core
 {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.Contracts;
 using Cirrious.CrossCore.Core;
 
 namespace System.Reactive.Linq
@@ -15,9 +10,9 @@ namespace System.Reactive.Linq
             Contract.Requires(source != null);
             Contract.Requires(dispatcher != null);
 
-            return Observable.Create<T>((observer) => source.Subscribe(
-                (value) => dispatcher.RequestMainThreadAction(() => observer.OnNext(value)),
-                (ex) => dispatcher.RequestMainThreadAction(() => observer.OnError(ex)),
+            return Observable.Create<T>(observer => source.Subscribe(
+                value => dispatcher.RequestMainThreadAction(() => observer.OnNext(value)),
+                ex => dispatcher.RequestMainThreadAction(() => observer.OnError(ex)),
                 () => dispatcher.RequestMainThreadAction(observer.OnCompleted)));
         }
     }

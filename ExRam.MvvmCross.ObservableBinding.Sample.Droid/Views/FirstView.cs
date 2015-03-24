@@ -10,7 +10,7 @@ namespace ExRam.MvvmCross.ObservableBinding.Sample.Views
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
-            SetContentView(Resource.Layout.FirstView);
+            this.SetContentView(Resource.Layout.FirstView);
         }
     }
 }
