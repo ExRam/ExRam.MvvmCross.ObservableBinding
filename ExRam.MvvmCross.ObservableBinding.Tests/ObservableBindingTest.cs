@@ -105,7 +105,6 @@ namespace ExRam.MvvmCross.ObservableBinding
                 {
                     return Observable.Interval(TimeSpan.FromMilliseconds(100)).Select(x => new Bar((int)x));
                 }
-
             }
         }
         #endregion
@@ -166,6 +165,16 @@ namespace ExRam.MvvmCross.ObservableBinding
             var binding = factory.CreateBinding(new Foo(), "StringObservable");
 
             Assert.AreEqual(typeof(string), binding.SourceType);
+            Assert.AreEqual("Hello", binding.GetValue());
+        }
+
+        [TestMethod]
+        public void Binding_directly_to_observable_succeeds()
+        {
+            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var binding = factory.CreateBinding(Observable.Return("Hello"), "");
+
+            Assert.AreEqual(typeof(object), binding.SourceType);
             Assert.AreEqual("Hello", binding.GetValue());
         }
 

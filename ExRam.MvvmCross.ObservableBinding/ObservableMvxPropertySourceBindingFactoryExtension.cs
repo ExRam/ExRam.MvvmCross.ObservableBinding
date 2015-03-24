@@ -14,42 +14,54 @@ namespace ExRam.MvvmCross.ObservableBinding
         public bool TryCreateBinding(object source, MvxPropertyToken currentToken,
                                      List<MvxPropertyToken> remainingTokens, out IMvxSourceBinding result)
         {
-            if (source == null)
+            if (source != null)
             {
-                result = null;
-                return false;
+                if (currentToken is MvxEmptyPropertyToken)
+                {
+                    var observable = source as IObservable<object>;
+                    if (observable != null)
+                    {
+                        result = new ObservableMvxSourceBinding(observable, typeof(object), remainingTokens);
+                        return true;
+                    }
+                }
+                else
+                {
+                    var propertyNameToken = currentToken as MvxPropertyNamePropertyToken;
+                    if (propertyNameToken == null)
+                    {
+                        result = null;
+                        return false;
+                    }
+
+                    var propertyInfo = this.FindPropertyInfo(source, propertyNameToken.PropertyName);
+                    if (propertyInfo == null)
+                    {
+                        result = null;
+                        return false;
+                    }
+
+                    var propertyTypeInfo = propertyInfo.PropertyType.GetTypeInfo();
+                    if (!((propertyTypeInfo.IsGenericType) && (propertyTypeInfo.GetGenericTypeDefinition() == typeof(IObservable<>))))
+                    {
+                        result = null;
+                        return false;
+                    }
+
+                    var value = propertyInfo.GetValue(source, ObservableMvxPropertySourceBindingFactoryExtension.EmptyObjectArray) as IObservable<object>;
+                    if (value == null)
+                    {
+                        result = null;
+                        return false;
+                    }
+
+                    result = new ObservableMvxSourceBinding(value, propertyTypeInfo.GenericTypeArguments[0], remainingTokens);
+                    return true;
+                }
             }
 
-            var propertyNameToken = currentToken as MvxPropertyNamePropertyToken;
-            if (propertyNameToken == null)
-            {
-                result = null;
-                return false;
-            }
-
-            var propertyInfo = this.FindPropertyInfo(source, propertyNameToken.PropertyName);
-            if (propertyInfo == null)
-            {
-                result = null;
-                return false;
-            }
-
-            var propertyTypeInfo = propertyInfo.PropertyType.GetTypeInfo();
-            if (!((propertyTypeInfo.IsGenericType) && (propertyTypeInfo.GetGenericTypeDefinition() == typeof(IObservable<>))))
-            {
-                result = null;
-                return false;
-            }
-
-            var value = propertyInfo.GetValue(source, ObservableMvxPropertySourceBindingFactoryExtension.EmptyObjectArray) as IObservable<object>;
-            if (value == null)
-            {
-                result = null;
-                return false;
-            }
-  
-            result = new ObservableMvxSourceBinding(value, propertyTypeInfo.GenericTypeArguments[0], remainingTokens);
-            return true;
+            result = null;
+            return false;
         }
 
         protected PropertyInfo FindPropertyInfo(object source, string name)
