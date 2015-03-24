@@ -28,35 +28,24 @@ namespace ExRam.MvvmCross.ObservableBinding
                 else
                 {
                     var propertyNameToken = currentToken as MvxPropertyNamePropertyToken;
-                    if (propertyNameToken == null)
+                    if (propertyNameToken != null)
                     {
-                        result = null;
-                        return false;
-                    }
+                        var propertyInfo = this.FindPropertyInfo(source, propertyNameToken.PropertyName);
+                        if (propertyInfo != null)
+                        {
+                            var propertyTypeInfo = propertyInfo.PropertyType.GetTypeInfo();
+                            if ((propertyTypeInfo.IsGenericType) && (propertyTypeInfo.GetGenericTypeDefinition() == typeof (IObservable<>)))
+                            {
+                                var value = propertyInfo.GetValue(source, ObservableMvxPropertySourceBindingFactoryExtension.EmptyObjectArray) as IObservable<object>;
 
-                    var propertyInfo = this.FindPropertyInfo(source, propertyNameToken.PropertyName);
-                    if (propertyInfo == null)
-                    {
-                        result = null;
-                        return false;
+                                if (value != null)
+                                {
+                                    result = new ObservableMvxSourceBinding(value, propertyTypeInfo.GenericTypeArguments[0], remainingTokens);
+                                    return true;
+                                }
+                            }
+                        }
                     }
-
-                    var propertyTypeInfo = propertyInfo.PropertyType.GetTypeInfo();
-                    if (!((propertyTypeInfo.IsGenericType) && (propertyTypeInfo.GetGenericTypeDefinition() == typeof(IObservable<>))))
-                    {
-                        result = null;
-                        return false;
-                    }
-
-                    var value = propertyInfo.GetValue(source, ObservableMvxPropertySourceBindingFactoryExtension.EmptyObjectArray) as IObservable<object>;
-                    if (value == null)
-                    {
-                        result = null;
-                        return false;
-                    }
-
-                    result = new ObservableMvxSourceBinding(value, propertyTypeInfo.GenericTypeArguments[0], remainingTokens);
-                    return true;
                 }
             }
 
