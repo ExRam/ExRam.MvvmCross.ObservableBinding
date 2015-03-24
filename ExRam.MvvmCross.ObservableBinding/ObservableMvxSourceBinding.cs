@@ -26,7 +26,6 @@ namespace ExRam.MvvmCross.ObservableBinding
             this._sourceType = sourceType;
 
             this._sourceSubscription = source
-                .ToWeakObservable()
                 .Subscribe(value =>
                 {
                     this._currentValue = value;
