@@ -2,6 +2,7 @@
 // ExRam.MvvmCross.ObservableBinding is licensed using Microsoft Public License (Ms-PL)
 
 using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
 using Cirrious.MvvmCross.Binding.Parse.PropertyPath;
 using Cirrious.MvvmCross.Test.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace ExRam.MvvmCross.ObservableBinding
 {
@@ -176,6 +178,38 @@ namespace ExRam.MvvmCross.ObservableBinding
 
             Assert.AreEqual(typeof(object), binding.SourceType);
             Assert.AreEqual("Hello", binding.GetValue());
+        }
+
+        [TestMethod]
+        public void Disposing_the_binding_unsubscribes_from_source()
+        {
+            Mock<IDisposable> disposableMock = null;
+
+            var observable = Observable
+                .Create<string>(obs =>
+                {
+                    var subscription = Observable
+                        .Return("Hello").Concat(Observable.Never<string>())
+                        .Subscribe(obs);
+
+                    disposableMock = new Mock<IDisposable>();
+                    disposableMock.Setup(x => x.Dispose()).Callback(subscription.Dispose);
+
+                    return disposableMock.Object;
+                });
+
+            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            using (var binding = factory.CreateBinding(observable, ""))
+            {
+                Assert.IsNotNull(disposableMock);
+
+                Assert.AreEqual(typeof(object), binding.SourceType);
+                Assert.AreEqual("Hello", binding.GetValue());
+
+                disposableMock.Verify(x => x.Dispose(), Times.Never());
+            }
+
+            disposableMock.Verify(x => x.Dispose(), Times.Once());
         }
 
         [TestMethod]
