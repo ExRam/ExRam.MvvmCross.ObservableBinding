@@ -42,9 +42,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ExRam.Extensions\ExRam.Extensions\System\Reactive\Linq\ObservableExtensions %28ToWeakObservable%29.cs">
-      <Link>ObservableExtensions %28ToWeakObservable%29.cs</Link>
-    </Compile>
     <Compile Include="ObservableExtensions.cs" />
     <Compile Include="ObservableMvxSourceBinding.cs" />
     <Compile Include="ObservableMvxPropertySourceBindingFactoryExtension.cs" />
