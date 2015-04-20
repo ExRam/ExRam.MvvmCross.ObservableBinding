@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Reflection;
 using Cirrious.MvvmCross.Binding.Bindings.Source;
 using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
@@ -10,6 +11,7 @@ namespace ExRam.MvvmCross.ObservableBinding
     public class ObservableMvxPropertySourceBindingFactoryExtension : IMvxSourceBindingFactoryExtension
     {
         private static readonly object[] EmptyObjectArray = new object[0];
+        private static readonly MethodInfo BoxMethod = typeof(InternalObservableExtensions).GetTypeInfo().GetDeclaredMethod("Box");
 
         public bool TryCreateBinding(object source, MvxPropertyToken currentToken,
                                      List<MvxPropertyToken> remainingTokens, out IMvxSourceBinding result)
@@ -36,10 +38,16 @@ namespace ExRam.MvvmCross.ObservableBinding
                             var propertyTypeInfo = propertyInfo.PropertyType.GetTypeInfo();
                             if ((propertyTypeInfo.IsGenericType) && (propertyTypeInfo.GetGenericTypeDefinition() == typeof (IObservable<>)))
                             {
-                                var value = propertyInfo.GetValue(source, ObservableMvxPropertySourceBindingFactoryExtension.EmptyObjectArray) as IObservable<object>;
+                                var rawValue = propertyInfo.GetValue(source, ObservableMvxPropertySourceBindingFactoryExtension.EmptyObjectArray);
 
-                                if (value != null)
+                                if (rawValue != null)
                                 {
+                                    var typeParameter = propertyTypeInfo.GenericTypeArguments[0];
+
+                                    var value = (typeParameter.GetTypeInfo().IsValueType)
+                                        ? (IObservable<object>)ObservableMvxPropertySourceBindingFactoryExtension.BoxMethod.MakeGenericMethod(typeParameter).Invoke(null, new[]{ rawValue })
+                                        : rawValue as IObservable<object>;
+
                                     result = new ObservableMvxSourceBinding(value, propertyTypeInfo.GenericTypeArguments[0], remainingTokens);
                                     return true;
                                 }

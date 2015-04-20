@@ -213,12 +213,14 @@ namespace ExRam.MvvmCross.ObservableBinding
         }
 
         [TestMethod]
-        public void Binding_to_Foo_BoolObservable_does_not_succeed()
+        public void Binding_to_Foo_BoolObservable_succeeds()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "BoolObservable");
 
-            Assert.AreEqual(typeof(IObservable<bool>), binding.SourceType);
+            Assert.AreEqual(typeof(bool), binding.SourceType);
+            Assert.IsTrue(binding.GetValue() is bool);
+            Assert.AreEqual(true, binding.GetValue());
         }
 
         [TestMethod]

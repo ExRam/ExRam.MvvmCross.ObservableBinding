@@ -42,6 +42,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InternalObservableExtensions.cs" />
     <Compile Include="ObservableExtensions.cs" />
     <Compile Include="ObservableMvxSourceBinding.cs" />
     <Compile Include="ObservableMvxPropertySourceBindingFactoryExtension.cs" />
