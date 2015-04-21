@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
 using Cirrious.MvvmCross.Binding.Bindings.Source;
@@ -17,6 +18,9 @@ namespace ExRam.MvvmCross.ObservableBinding
         {
             if (source != null)
             {
+                Type bindingSourceType = null;
+                Type observableTypeParameter = null;
+
                 if (currentToken is MvxEmptyPropertyToken)
                 {
                     var observable = source as IObservable<object>;
@@ -25,6 +29,15 @@ namespace ExRam.MvvmCross.ObservableBinding
                         result = new ObservableMvxSourceBinding<object>(observable, typeof(object), remainingTokens);
                         return true;
                     }
+
+                    var implementedInterface = source
+                        .GetType()
+                        .GetTypeInfo()
+                        .ImplementedInterfaces
+                        .FirstOrDefault(iface => ((iface.IsConstructedGenericType) && (iface.GetGenericTypeDefinition() == typeof(IObservable<>))));
+                       
+                    if (implementedInterface != null)
+                        bindingSourceType = observableTypeParameter = implementedInterface.GenericTypeArguments[0];
                 }
                 else
                 {
@@ -37,26 +50,29 @@ namespace ExRam.MvvmCross.ObservableBinding
                             var propertyTypeInfo = propertyInfo.PropertyType.GetTypeInfo();
                             if ((propertyTypeInfo.IsGenericType) && (propertyTypeInfo.GetGenericTypeDefinition() == typeof (IObservable<>)))
                             {
-                                var rawValue = propertyInfo.GetValue(source, ObservableMvxPropertySourceBindingFactoryExtension.EmptyObjectArray);
+                                source = propertyInfo.GetValue(source, ObservableMvxPropertySourceBindingFactoryExtension.EmptyObjectArray);
 
-                                if (rawValue != null)
+                                if (source != null)
                                 {
-                                    var typeParameter = propertyTypeInfo.GenericTypeArguments[0];
-                                    var bindingTypeParameter = (typeParameter.GetTypeInfo().IsValueType)
-                                        ? typeParameter
+                                    bindingSourceType = propertyTypeInfo.GenericTypeArguments[0];
+                                    observableTypeParameter = (bindingSourceType.GetTypeInfo().IsValueType)
+                                        ? bindingSourceType
                                         : typeof(object);
-
-                                    result = (IMvxSourceBinding)Activator.CreateInstance(
-                                        typeof(ObservableMvxSourceBinding<>).MakeGenericType(bindingTypeParameter), 
-                                        rawValue,
-                                        typeParameter,
-                                        remainingTokens);
-
-                                    return true;
                                 }
                             }
                         }
                     }
+                }
+
+                if (observableTypeParameter != null)
+                {
+                    result = (IMvxSourceBinding)Activator.CreateInstance(
+                                typeof(ObservableMvxSourceBinding<>).MakeGenericType(observableTypeParameter),
+                                source,
+                                bindingSourceType,
+                                remainingTokens);
+
+                    return true;
                 }
             }
 

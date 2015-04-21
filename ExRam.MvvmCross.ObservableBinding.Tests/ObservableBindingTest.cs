@@ -181,6 +181,16 @@ namespace ExRam.MvvmCross.ObservableBinding
         }
 
         [TestMethod]
+        public void Binding_directly_to_valuetype_observable_succeeds()
+        {
+            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var binding = factory.CreateBinding(Observable.Return(true), "");
+
+            Assert.AreEqual(typeof(bool), binding.SourceType);
+            Assert.AreEqual(true, binding.GetValue());
+        }
+
+        [TestMethod]
         public void Disposing_the_binding_unsubscribes_from_source()
         {
             Mock<IDisposable> disposableMock = null;
