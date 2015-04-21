@@ -228,10 +228,10 @@ namespace ExRam.MvvmCross.ObservableBinding
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "BoolObservable");
 
-            Assert.AreEqual(typeof(bool), binding.SourceType);
-            Assert.IsTrue(binding.GetValue() is bool);
-            Assert.AreEqual(true, binding.GetValue());
-        }
+                Assert.AreEqual(typeof(bool), binding.SourceType);
+                Assert.IsTrue(binding.GetValue() is bool);
+                Assert.AreEqual(true, binding.GetValue());
+            }
 
         [TestMethod]
         public void Binding_to_Foo_BoxedBoolObservable_succeeds()
@@ -248,10 +248,11 @@ namespace ExRam.MvvmCross.ObservableBinding
         public void Binding_to_Foo_NestedBarObservable_succeeds()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
-            var binding = factory.CreateBinding(new Foo(), "NestedBarObservable.BarProperty");
-
-            Assert.AreEqual(typeof(string), binding.SourceType);
-            Assert.AreEqual("Hello", binding.GetValue());
+            using (var binding = factory.CreateBinding(new Foo(), "NestedBarObservable.BarProperty"))
+            {
+                Assert.AreEqual(typeof(string), binding.SourceType);
+                Assert.AreEqual("Hello", binding.GetValue());
+            }
         }
 
         [TestMethod]
@@ -290,6 +291,17 @@ namespace ExRam.MvvmCross.ObservableBinding
             {
                 Assert.AreEqual(i, array[i]);
             }
+        }
+
+        [TestMethod]
+        public void SetValue_does_nothing()
+        {
+            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var binding = factory.CreateBinding(new Foo(), "DynamicNestedBarObservable.Value");
+
+            binding.SetValue("Some value");
+            binding.SetValue(36);
+            binding.SetValue(new object());
         }
 
         [TestMethod]
