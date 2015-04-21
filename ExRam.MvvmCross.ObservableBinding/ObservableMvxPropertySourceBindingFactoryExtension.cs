@@ -67,10 +67,10 @@ namespace ExRam.MvvmCross.ObservableBinding
                 if (observableTypeParameter != null)
                 {
                     result = (IMvxSourceBinding)Activator.CreateInstance(
-                                typeof(ObservableMvxSourceBinding<>).MakeGenericType(observableTypeParameter),
-                                source,
-                                bindingSourceType,
-                                remainingTokens);
+                        typeof(ObservableMvxSourceBinding<>).MakeGenericType(observableTypeParameter),
+                        source,
+                        bindingSourceType,
+                        remainingTokens);
 
                     return true;
                 }
