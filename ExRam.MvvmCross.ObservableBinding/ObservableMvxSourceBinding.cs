@@ -10,18 +10,18 @@ using Cirrious.MvvmCross.Binding.Parse.PropertyPath.PropertyTokens;
 
 namespace ExRam.MvvmCross.ObservableBinding
 {
-    internal sealed class ObservableMvxSourceBinding : IMvxSourceBinding
+    internal sealed class ObservableMvxSourceBinding<T> : IMvxSourceBinding
     {
         public event EventHandler Changed;
 
         private readonly IDisposable _sourceSubscription;
         private readonly Type _sourceType;
 
-        private object _currentValue;
+        private T _currentValue;
         private IMvxSourceBinding _currentSubBinding;
         private IDisposable _currentSubBindingSubscription;
 
-        public ObservableMvxSourceBinding(IObservable<object> source, Type sourceType, List<MvxPropertyToken> remainingTokens)
+        public ObservableMvxSourceBinding(IObservable<T> source, Type sourceType, List<MvxPropertyToken> remainingTokens)
         {
             this._sourceType = sourceType;
 
