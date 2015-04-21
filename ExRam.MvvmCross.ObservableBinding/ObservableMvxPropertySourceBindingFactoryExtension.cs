@@ -11,7 +11,30 @@ namespace ExRam.MvvmCross.ObservableBinding
 {
     public class ObservableMvxPropertySourceBindingFactoryExtension : IMvxSourceBindingFactoryExtension
     {
+        // ReSharper disable once NotAccessedField.Local
+        private static readonly Type[] BindingTypes;
         private static readonly object[] EmptyObjectArray = new object[0];
+        
+        static ObservableMvxPropertySourceBindingFactoryExtension()
+        {
+            ObservableMvxPropertySourceBindingFactoryExtension.BindingTypes = new[]
+            {
+                typeof(ObservableMvxSourceBinding<object>),
+                typeof(ObservableMvxSourceBinding<bool>),
+                typeof(ObservableMvxSourceBinding<char>),
+                typeof(ObservableMvxSourceBinding<byte>),
+                typeof(ObservableMvxSourceBinding<sbyte>),
+                typeof(ObservableMvxSourceBinding<short>),
+                typeof(ObservableMvxSourceBinding<ushort>),
+                typeof(ObservableMvxSourceBinding<int>),
+                typeof(ObservableMvxSourceBinding<uint>),
+                typeof(ObservableMvxSourceBinding<long>),
+                typeof(ObservableMvxSourceBinding<ulong>),
+                typeof(ObservableMvxSourceBinding<float>),
+                typeof(ObservableMvxSourceBinding<double>),
+                typeof(ObservableMvxSourceBinding<decimal>)
+            };
+        }
 
         public bool TryCreateBinding(object source, MvxPropertyToken currentToken,
                                      List<MvxPropertyToken> remainingTokens, out IMvxSourceBinding result)
