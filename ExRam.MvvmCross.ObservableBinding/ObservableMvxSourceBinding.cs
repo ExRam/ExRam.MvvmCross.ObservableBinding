@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using Cirrious.CrossCore.Core;
 using Cirrious.MvvmCross.Binding;
 using Cirrious.MvvmCross.Binding.Bindings.Source;
 using Cirrious.MvvmCross.Binding.Parse.PropertyPath.PropertyTokens;
@@ -21,9 +22,12 @@ namespace ExRam.MvvmCross.ObservableBinding
         private IMvxSourceBinding _currentSubBinding;
         private IDisposable _currentSubBindingSubscription;
 
-        public ObservableMvxSourceBinding(IObservable<T> source, Type sourceType, List<MvxPropertyToken> remainingTokens)
+        public ObservableMvxSourceBinding(IObservable<T> source, Type sourceType, IMvxMainThreadDispatcher mainThreadDispatcher, List<MvxPropertyToken> remainingTokens)
         {
             this._sourceType = sourceType;
+
+            if (mainThreadDispatcher != null)
+                source = source.ObserveOn(mainThreadDispatcher);
 
             this._sourceSubscription = source
                 .Subscribe(value =>

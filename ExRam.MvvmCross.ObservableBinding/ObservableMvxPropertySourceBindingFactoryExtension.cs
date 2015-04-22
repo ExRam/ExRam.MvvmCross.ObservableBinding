@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
+using Cirrious.CrossCore.Core;
 using Cirrious.MvvmCross.Binding.Bindings.Source;
 using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
 using Cirrious.MvvmCross.Binding.Parse.PropertyPath.PropertyTokens;
@@ -13,6 +15,8 @@ namespace ExRam.MvvmCross.ObservableBinding
         // ReSharper disable once NotAccessedField.Local
         private static readonly Type[] BindingTypes;
         private static readonly object[] EmptyObjectArray = new object[0];
+
+        private readonly IMvxMainThreadDispatcher _mainThreadDispatcher;
         
         static ObservableMvxPropertySourceBindingFactoryExtension()
         {
@@ -35,6 +39,18 @@ namespace ExRam.MvvmCross.ObservableBinding
             };
         }
 
+        public ObservableMvxPropertySourceBindingFactoryExtension()
+        {
+            
+        }
+
+        public ObservableMvxPropertySourceBindingFactoryExtension(IMvxMainThreadDispatcher mainThreadDispatcher)
+        {
+            Contract.Requires(mainThreadDispatcher != null);
+
+            this._mainThreadDispatcher = mainThreadDispatcher;
+        }
+
         public bool TryCreateBinding(object source, MvxPropertyToken currentToken,
                                      List<MvxPropertyToken> remainingTokens, out IMvxSourceBinding result)
         {
@@ -48,7 +64,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                     var observable = source as IObservable<object>;
                     if (observable != null)
                     {
-                        result = new ObservableMvxSourceBinding<object>(observable, typeof(object), remainingTokens);
+                        result = new ObservableMvxSourceBinding<object>(observable, typeof(object), this._mainThreadDispatcher, remainingTokens);
                         return true;
                     }
 
@@ -92,6 +108,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                         typeof(ObservableMvxSourceBinding<>).MakeGenericType(bindingTypeParameter),
                         source,
                         bindingSourceType,
+                        this._mainThreadDispatcher,
                         remainingTokens);
 
                     return true;
