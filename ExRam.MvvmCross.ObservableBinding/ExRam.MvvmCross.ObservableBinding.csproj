@@ -45,6 +45,7 @@
     <Compile Include="ObservableExtensions.cs" />
     <Compile Include="ObservableMvxSourceBinding.cs" />
     <Compile Include="ObservableMvxPropertySourceBindingFactoryExtension.cs" />
+    <Compile Include="PluginLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
