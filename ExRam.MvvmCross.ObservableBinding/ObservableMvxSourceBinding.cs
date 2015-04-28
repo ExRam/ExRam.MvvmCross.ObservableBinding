@@ -23,7 +23,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         private IMvxSourceBinding _currentSubBinding;
         private IDisposable _currentSubBindingSubscription;
 
-        public ObservableMvxSourceBinding(IObservable<T> source, Type sourceType, IMvxMainThreadDispatcher mainThreadDispatcher, List<MvxPropertyToken> remainingTokens)
+        public ObservableMvxSourceBinding(IObservable<T> source, Type sourceType, IMvxMainThreadDispatcher mainThreadDispatcher, IList<MvxPropertyToken> remainingTokens)
         {
             Contract.Requires(source != null);
             Contract.Requires(sourceType != null);
@@ -52,7 +52,7 @@ namespace ExRam.MvvmCross.ObservableBinding
 
                     IMvxSourceBinding newSubBinding = null;
                     if ((remainingTokens != null) && (remainingTokens.Count > 0))
-                        newSubBinding = MvxBindingSingletonCache.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
+                        newSubBinding = MvxSingleton<IMvxBindingSingletonCache>.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
 
                     var subBindingObservable = (newSubBinding != null)
                         ? Observable

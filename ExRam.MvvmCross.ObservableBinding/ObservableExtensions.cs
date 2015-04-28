@@ -3,7 +3,7 @@ using Cirrious.CrossCore.Core;
 
 namespace System.Reactive.Linq
 {
-    public static partial class ObservableExtensions
+    public static class ObservableExtensions
     {
         public static IObservable<T> ObserveOn<T>(this IObservable<T> source, IMvxMainThreadDispatcher dispatcher)
         {

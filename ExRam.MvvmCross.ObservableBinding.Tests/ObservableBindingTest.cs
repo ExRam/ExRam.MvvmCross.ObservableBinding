@@ -2,11 +2,10 @@
 // ExRam.MvvmCross.ObservableBinding is licensed using Microsoft Public License (Ms-PL)
 
 using System;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using Cirrious.CrossCore;
 using Cirrious.MvvmCross.Binding;
 using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
@@ -30,6 +29,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 this._value = value;
             }
 
+            // ReSharper disable once UnusedMember.Local
             public string BarProperty
             {
                 get
@@ -38,6 +38,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 }
             }
 
+            // ReSharper disable once UnusedMember.Local
             public int Value
             {
                 get
@@ -46,6 +47,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 }
             }
 
+            // ReSharper disable once UnusedMember.Local
             public IObservable<string> StringObservable
             {
                 get
@@ -61,6 +63,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         #region Foo
         private sealed class Foo
         {
+            // ReSharper disable once UnusedMember.Local
             public IObservable<string> StringObservable
             {
                 get
@@ -69,6 +72,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 }
             }
 
+            // ReSharper disable once UnusedMember.Local
             public IObservable<bool> BoolObservable
             {
                 get
@@ -77,6 +81,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 }
             }
 
+            // ReSharper disable once UnusedMember.Local
             public IObservable<object> BoxedBoolObservable
             {
                 get
@@ -85,6 +90,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 }
             }
 
+            // ReSharper disable once UnusedMember.Local
             public IObservable<object> BoxedDynamicIntObservable
             {
                 get
@@ -93,6 +99,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 }
             }
 
+            // ReSharper disable once UnusedMember.Local
             public IObservable<Bar> NestedBarObservable
             {
                 get
@@ -101,6 +108,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 }
             }
 
+            // ReSharper disable once UnusedMember.Local
             public IObservable<Bar> DynamicNestedBarObservable
             {
                 get
@@ -117,6 +125,7 @@ namespace ExRam.MvvmCross.ObservableBinding
             private readonly Subject<int> _intPropertySetSubject = new Subject<int>();
             private int _currentIntProperty;
 
+            // ReSharper disable once UnusedMember.Local
             public int IntProperty
             {
                 get
@@ -131,6 +140,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                 }
             }
 
+            // ReSharper disable once UnusedMember.Local
             public IObservable<int> BoolPropertySetObservable
             {
                 get
@@ -157,6 +167,7 @@ namespace ExRam.MvvmCross.ObservableBinding
             base.Ioc.RegisterSingleton<IMvxSourceBindingFactory>(factory);
             base.Ioc.RegisterSingleton<IMvxSourcePropertyPathParser>(new MvxSourcePropertyPathParser());
 
+            // ReSharper disable once UnusedVariable
             var cache = new MvxBindingSingletonCache();
         }
 
