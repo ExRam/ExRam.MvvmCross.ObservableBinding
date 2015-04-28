@@ -21,8 +21,7 @@ namespace ExRam.MvvmCross.ObservableBinding.Sample.Core
             {
                 return Observable
                     .Timer(TimeSpan.Zero, TimeSpan.FromSeconds(1))
-                    .Select(x => DateTime.Now.Add(this._offset).ToString("HH:mm:ss"))
-                    .ObserveOn(this.Dispatcher);
+                    .Select(x => DateTime.Now.Add(this._offset).ToString("HH:mm:ss"));
             }
         }
 

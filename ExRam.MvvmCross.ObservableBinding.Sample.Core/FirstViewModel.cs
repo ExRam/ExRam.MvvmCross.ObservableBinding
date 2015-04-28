@@ -25,8 +25,7 @@ namespace ExRam.MvvmCross.ObservableBinding.Sample.Core
             {
                 return Observable
                     .Timer(TimeSpan.Zero, TimeSpan.FromSeconds(5))
-                    .Select(x => this._cities[x % this._cities.Length])
-                    .ObserveOn(this.Dispatcher);
+                    .Select(x => this._cities[x % this._cities.Length]);
             }
         }
 
@@ -36,8 +35,7 @@ namespace ExRam.MvvmCross.ObservableBinding.Sample.Core
             {
                 return Observable
                     .Interval(TimeSpan.FromSeconds(1))
-                    .Select(x => x.ToString())
-                    .ObserveOn(this.Dispatcher);
+                    .Select(x => x.ToString());
             }
         }
     }
