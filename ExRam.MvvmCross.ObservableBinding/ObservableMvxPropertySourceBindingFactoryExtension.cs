@@ -121,6 +121,8 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         protected PropertyInfo FindPropertyInfo(object source, string name)
         {
+            Contract.Requires(source != null);
+
             var propertyInfo = source.GetType()
                 .GetRuntimeProperty(name);
 

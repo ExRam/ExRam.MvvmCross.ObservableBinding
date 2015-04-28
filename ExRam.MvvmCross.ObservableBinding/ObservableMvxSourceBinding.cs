@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reactive.Linq;
 using Cirrious.CrossCore.Core;
 using Cirrious.MvvmCross.Binding;
@@ -24,6 +25,9 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         public ObservableMvxSourceBinding(IObservable<T> source, Type sourceType, IMvxMainThreadDispatcher mainThreadDispatcher, List<MvxPropertyToken> remainingTokens)
         {
+            Contract.Requires(source != null);
+            Contract.Requires(sourceType != null);
+
             this._sourceType = sourceType;
 
             if (mainThreadDispatcher != null)
