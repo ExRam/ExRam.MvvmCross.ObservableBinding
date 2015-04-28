@@ -1,6 +1,7 @@
 using Android.Content;
 using Cirrious.CrossCore;
 using Cirrious.CrossCore.Platform;
+using Cirrious.CrossCore.Plugins;
 using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
 using Cirrious.MvvmCross.Droid.Platform;
 using Cirrious.MvvmCross.ViewModels;
@@ -13,11 +14,11 @@ namespace ExRam.MvvmCross.ObservableBinding.Sample
         {
         }
 
-        protected override void InitializeLastChance()
+        public override void LoadPlugins(IMvxPluginManager pluginManager)
         {
-            base.InitializeLastChance();
+            base.LoadPlugins(pluginManager);
 
-            Mvx.Resolve<IMvxSourceBindingFactoryExtensionHost>().Extensions.Insert(0, new ObservableMvxPropertySourceBindingFactoryExtension());
+            PluginLoader.Instance.EnsureLoaded();
         }
 
         protected override IMvxApplication CreateApp()
