@@ -1,7 +1,7 @@
-﻿using Cirrious.CrossCore;
-using Cirrious.CrossCore.Core;
-using Cirrious.CrossCore.Plugins;
-using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
+﻿using MvvmCross.Binding.Bindings.Source.Construction;
+using MvvmCross.Platform;
+using MvvmCross.Platform.Core;
+using MvvmCross.Platform.Plugins;
 
 namespace ExRam.MvvmCross.ObservableBinding
 {

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
-using Cirrious.CrossCore.Core;
-using Cirrious.MvvmCross.Binding.Bindings.Source;
-using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
-using Cirrious.MvvmCross.Binding.Parse.PropertyPath.PropertyTokens;
+using MvvmCross.Binding.Bindings.Source;
+using MvvmCross.Binding.Bindings.Source.Construction;
+using MvvmCross.Binding.Parse.PropertyPath.PropertyTokens;
+using MvvmCross.Platform.Core;
 
 namespace ExRam.MvvmCross.ObservableBinding
 {

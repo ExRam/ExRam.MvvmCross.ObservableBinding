@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
-using Cirrious.CrossCore.Core;
+using MvvmCross.Platform.Core;
 
 namespace ExRam.MvvmCross.ObservableBinding.Sample.Core
 {

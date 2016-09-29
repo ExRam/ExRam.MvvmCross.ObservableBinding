@@ -6,13 +6,13 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Cirrious.CrossCore;
-using Cirrious.MvvmCross.Binding;
-using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
-using Cirrious.MvvmCross.Binding.Parse.PropertyPath;
-using Cirrious.MvvmCross.Test.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using MvvmCross.Binding;
+using MvvmCross.Binding.Bindings.Source.Construction;
+using MvvmCross.Binding.Parse.PropertyPath;
+using MvvmCross.Platform;
+using MvvmCross.Test.Core;
 
 namespace ExRam.MvvmCross.ObservableBinding
 {

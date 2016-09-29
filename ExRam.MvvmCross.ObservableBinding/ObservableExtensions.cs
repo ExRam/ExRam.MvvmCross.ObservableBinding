@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
-using Cirrious.CrossCore.Core;
+using MvvmCross.Platform.Core;
 
 namespace System.Reactive.Linq
 {

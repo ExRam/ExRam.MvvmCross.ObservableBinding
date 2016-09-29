@@ -1,10 +1,8 @@
 using Android.Content;
-using Cirrious.CrossCore;
-using Cirrious.CrossCore.Platform;
-using Cirrious.CrossCore.Plugins;
-using Cirrious.MvvmCross.Binding.Bindings.Source.Construction;
-using Cirrious.MvvmCross.Droid.Platform;
-using Cirrious.MvvmCross.ViewModels;
+using MvvmCross.Core.ViewModels;
+using MvvmCross.Droid.Platform;
+using MvvmCross.Platform.Platform;
+using MvvmCross.Platform.Plugins;
 
 namespace ExRam.MvvmCross.ObservableBinding.Sample
 {

@@ -1,6 +1,6 @@
 using Android.App;
 using Android.OS;
-using Cirrious.MvvmCross.Droid.Views;
+using MvvmCross.Droid.Views;
 
 namespace ExRam.MvvmCross.ObservableBinding.Sample.Views
 {

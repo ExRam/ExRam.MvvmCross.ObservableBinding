@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
-using Cirrious.MvvmCross.ViewModels;
+using MvvmCross.Core.ViewModels;
 
 namespace ExRam.MvvmCross.ObservableBinding.Sample.Core
 {
