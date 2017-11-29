@@ -6,17 +6,16 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using MvvmCross.Binding;
 using MvvmCross.Binding.Bindings.Source.Construction;
 using MvvmCross.Binding.Parse.PropertyPath;
 using MvvmCross.Platform;
 using MvvmCross.Test.Core;
+using Xunit;
 
 namespace ExRam.MvvmCross.ObservableBinding
 {
-    [TestClass]
     public class ObservableBindingTest : MvxIoCSupportingTest
     {
         #region Bar
@@ -171,37 +170,37 @@ namespace ExRam.MvvmCross.ObservableBinding
             var cache = new MvxBindingSingletonCache();
         }
 
-        [TestMethod]
+        [Fact]
         public void Binding_to_Foo_StringObservable_succeeds()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "StringObservable");
 
-            Assert.AreEqual(typeof(string), binding.SourceType);
-            Assert.AreEqual("Hello", binding.GetValue());
+            Assert.Equal(typeof(string), binding.SourceType);
+            Assert.Equal("Hello", binding.GetValue());
         }
 
-        [TestMethod]
+        [Fact]
         public void Binding_directly_to_observable_succeeds()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(Observable.Return("Hello"), "");
 
-            Assert.AreEqual(typeof(object), binding.SourceType);
-            Assert.AreEqual("Hello", binding.GetValue());
+            Assert.Equal(typeof(object), binding.SourceType);
+            Assert.Equal("Hello", binding.GetValue());
         }
 
-        [TestMethod]
+        [Fact]
         public void Binding_directly_to_valuetype_observable_succeeds()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(Observable.Return(true), "");
 
-            Assert.AreEqual(typeof(bool), binding.SourceType);
-            Assert.AreEqual(true, binding.GetValue());
+            Assert.Equal(typeof(bool), binding.SourceType);
+            Assert.True((bool)binding.GetValue());
         }
 
-        [TestMethod]
+        [Fact]
         public void Disposing_the_binding_unsubscribes_from_source()
         {
             Mock<IDisposable> disposableMock = null;
@@ -222,10 +221,10 @@ namespace ExRam.MvvmCross.ObservableBinding
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             using (var binding = factory.CreateBinding(observable, ""))
             {
-                Assert.IsNotNull(disposableMock);
+                Assert.NotNull(disposableMock);
 
-                Assert.AreEqual(typeof(object), binding.SourceType);
-                Assert.AreEqual("Hello", binding.GetValue());
+                Assert.Equal(typeof(object), binding.SourceType);
+                Assert.Equal("Hello", binding.GetValue());
 
                 disposableMock.Verify(x => x.Dispose(), Times.Never());
             }
@@ -233,46 +232,46 @@ namespace ExRam.MvvmCross.ObservableBinding
             disposableMock.Verify(x => x.Dispose(), Times.Once());
         }
 
-        [TestMethod]
+        [Fact]
         public void Binding_to_Foo_BoolObservable_succeeds()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "BoolObservable");
 
-                Assert.AreEqual(typeof(bool), binding.SourceType);
-                Assert.IsTrue(binding.GetValue() is bool);
-                Assert.AreEqual(true, binding.GetValue());
-            }
+            Assert.Equal(typeof(bool), binding.SourceType);
+            Assert.True(binding.GetValue() is bool);
+            Assert.True((bool)binding.GetValue());
+        }
 
-        [TestMethod]
+        [Fact]
         public void Binding_to_Foo_BoxedBoolObservable_succeeds()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "BoxedBoolObservable");
 
-            Assert.AreEqual(typeof(object), binding.SourceType);
-            Assert.IsTrue(binding.GetValue() is bool);
-            Assert.AreEqual(true, binding.GetValue());
+            Assert.Equal(typeof(object), binding.SourceType);
+            Assert.True(binding.GetValue() is bool);
+            Assert.True((bool)binding.GetValue());
         }
 
-        [TestMethod]
+        [Fact]
         public void Binding_to_Foo_NestedBarObservable_succeeds()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             using (var binding = factory.CreateBinding(new Foo(), "NestedBarObservable.BarProperty"))
             {
-                Assert.AreEqual(typeof(string), binding.SourceType);
-                Assert.AreEqual("Hello", binding.GetValue());
+                Assert.Equal(typeof(string), binding.SourceType);
+                Assert.Equal("Hello", binding.GetValue());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Binding_to_Foo_NestedBarObservable_produces_correct_values()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "NestedBarObservable.StringObservable");
 
-            Assert.AreEqual(typeof(string), binding.SourceType);
+            Assert.Equal(typeof(string), binding.SourceType);
 
             var array = await Observable.FromEventPattern<EventHandler, EventArgs>(eh => binding.Changed += eh, eh => binding.Changed -= eh)
                 .Select(x => binding.GetValue())
@@ -282,11 +281,11 @@ namespace ExRam.MvvmCross.ObservableBinding
 
             for (var i = 0; i < 10; i++)
             {
-                Assert.AreEqual(i.ToString(), array[i]);
+                Assert.Equal(i.ToString(), array[i]);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Binding_to_Foo_DynamicNestedBarObservable_Value_produces_correct_values()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
@@ -300,11 +299,11 @@ namespace ExRam.MvvmCross.ObservableBinding
 
             for (var i = 0; i < 10; i++)
             {
-                Assert.AreEqual(i, array[i]);
+                Assert.Equal(i, array[i]);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void SetValue_does_nothing()
         {
             var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
@@ -315,18 +314,18 @@ namespace ExRam.MvvmCross.ObservableBinding
             binding.SetValue(new object());
         }
 
-        [TestMethod]
+        [Fact]
         public void Covariance_and_contravariance_test()
         {
-            Assert.IsTrue(typeof(IObservable<string>).IsGenericType);
+            Assert.True(typeof(IObservable<string>).IsGenericType);
 
-            Assert.IsTrue(typeof(IObservable<string>).GetGenericTypeDefinition() == typeof(IObservable<>));
+            Assert.True(typeof(IObservable<string>).GetGenericTypeDefinition() == typeof(IObservable<>));
 
-            Assert.IsTrue(typeof(IObservable<object>).IsAssignableFrom(typeof(IObservable<string>)));
-            Assert.IsFalse(typeof(IObservable<object>).IsAssignableFrom(typeof(IObservable<bool>)));
+            Assert.True(typeof(IObservable<object>).IsAssignableFrom(typeof(IObservable<string>)));
+            Assert.False(typeof(IObservable<object>).IsAssignableFrom(typeof(IObservable<bool>)));
 
-            Assert.IsTrue(typeof(IObserver<string>).IsAssignableFrom(typeof(IObserver<object>)));
-            Assert.IsFalse(typeof(IObserver<bool>).IsAssignableFrom(typeof(IObserver<object>)));
+            Assert.True(typeof(IObserver<string>).IsAssignableFrom(typeof(IObserver<object>)));
+            Assert.False(typeof(IObserver<bool>).IsAssignableFrom(typeof(IObserver<object>)));
         }
     }
 }
