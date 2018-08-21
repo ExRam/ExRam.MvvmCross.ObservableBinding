@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
-using MvvmCross.Platform.Core;
+using MvvmCross.Base;
 
 namespace System.Reactive.Linq
 {

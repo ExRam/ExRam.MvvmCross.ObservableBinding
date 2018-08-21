@@ -7,11 +7,11 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Moq;
+using MvvmCross;
 using MvvmCross.Binding;
 using MvvmCross.Binding.Bindings.Source.Construction;
 using MvvmCross.Binding.Parse.PropertyPath;
-using MvvmCross.Platform;
-using MvvmCross.Test.Core;
+using MvvmCross.Tests;
 using Xunit;
 
 namespace ExRam.MvvmCross.ObservableBinding
@@ -165,9 +165,6 @@ namespace ExRam.MvvmCross.ObservableBinding
 
             base.Ioc.RegisterSingleton<IMvxSourceBindingFactory>(factory);
             base.Ioc.RegisterSingleton<IMvxSourcePropertyPathParser>(new MvxSourcePropertyPathParser());
-
-            // ReSharper disable once UnusedVariable
-            var cache = new MvxBindingSingletonCache();
         }
 
         [Fact]
