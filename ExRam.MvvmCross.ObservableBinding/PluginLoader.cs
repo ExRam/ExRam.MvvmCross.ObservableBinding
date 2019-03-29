@@ -10,7 +10,7 @@ namespace ExRam.MvvmCross.ObservableBinding
     {
         public void Load()
         {
-            Mvx.CallbackWhenRegistered<IMvxSourceBindingFactoryExtensionHost>(host => host.Extensions.Insert(0, new ObservableMvxPropertySourceBindingFactoryExtension(Mvx.Resolve<IMvxMainThreadDispatcher>())));
+            Mvx.CallbackWhenRegistered<IMvxSourceBindingFactoryExtensionHost>(host => host.Extensions.Insert(0, new ObservableMvxPropertySourceBindingFactoryExtension(Mvx.Resolve<IMvxMainThreadAsyncDispatcher>())));
         }
     }
 }

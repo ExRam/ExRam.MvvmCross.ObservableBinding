@@ -16,7 +16,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         private static readonly Type[] BindingTypes;
         private static readonly object[] EmptyObjectArray = new object[0];
 
-        private readonly IMvxMainThreadDispatcher _mainThreadDispatcher;
+        private readonly IMvxMainThreadAsyncDispatcher _mainThreadDispatcher;
         
         static ObservableMvxPropertySourceBindingFactoryExtension()
         {
@@ -44,7 +44,7 @@ namespace ExRam.MvvmCross.ObservableBinding
             
         }
 
-        public ObservableMvxPropertySourceBindingFactoryExtension(IMvxMainThreadDispatcher mainThreadDispatcher)
+        public ObservableMvxPropertySourceBindingFactoryExtension(IMvxMainThreadAsyncDispatcher mainThreadDispatcher)
         {
             Contract.Requires(mainThreadDispatcher != null);
 

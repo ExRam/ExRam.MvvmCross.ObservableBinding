@@ -23,7 +23,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         private IMvxSourceBinding _currentSubBinding;
         private IDisposable _currentSubBindingSubscription;
 
-        public ObservableMvxSourceBinding(IObservable<T> source, Type sourceType, IMvxMainThreadDispatcher mainThreadDispatcher, IList<MvxPropertyToken> remainingTokens)
+        public ObservableMvxSourceBinding(IObservable<T> source, Type sourceType, IMvxMainThreadAsyncDispatcher mainThreadDispatcher, IList<MvxPropertyToken> remainingTokens)
         {
             Contract.Requires(source != null);
             Contract.Requires(sourceType != null);
