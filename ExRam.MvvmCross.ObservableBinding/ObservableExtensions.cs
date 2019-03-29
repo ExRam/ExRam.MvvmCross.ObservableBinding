@@ -15,5 +15,16 @@ namespace System.Reactive.Linq
                 ex => dispatcher.RequestMainThreadAction(() => observer.OnError(ex)),
                 () => dispatcher.RequestMainThreadAction(observer.OnCompleted)));
         }
+
+        public static IObservable<T> ObserveOn<T>(this IObservable<T> source, IMvxMainThreadAsyncDispatcher dispatcher)
+        {
+            Contract.Requires(source != null);
+            Contract.Requires(dispatcher != null);
+
+            return Observable.Create<T>(observer => source.Subscribe(
+                value => dispatcher.ExecuteOnMainThreadAsync(() => observer.OnNext(value)),
+                ex => dispatcher.ExecuteOnMainThreadAsync(() => observer.OnError(ex)),
+                () => dispatcher.ExecuteOnMainThreadAsync(observer.OnCompleted)));
+        }
     }
 }
