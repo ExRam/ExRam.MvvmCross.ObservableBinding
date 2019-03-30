@@ -3,10 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq.Expressions;
 using System.Reactive.Linq;
-using System.Reflection;
 using MvvmCross.Base;
 using MvvmCross.Binding;
 using MvvmCross.Binding.Bindings.Source;
@@ -27,61 +24,56 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         public ObservableMvxSourceBinding(IObservable<T> source, Type sourceType, IMvxMainThreadAsyncDispatcher mainThreadDispatcher, IList<MvxPropertyToken> remainingTokens)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(sourceType != null);
-
-            this._sourceType = sourceType;
+            _sourceType = sourceType;
 
             if (mainThreadDispatcher != null)
                 source = source.ObserveOn(mainThreadDispatcher);
 
-            this._sourceSubscription = source
+            _sourceSubscription = source
                 .Subscribe(value =>
                 {
-                    this._currentValue = value;
+                    _currentValue = value;
 
-                    if (this._currentSubBinding != null)
+                    if (_currentSubBinding != null)
                     {
-                        this._currentSubBinding.Dispose();
-                        this._currentSubBinding = null;
+                        _currentSubBinding.Dispose();
+                        _currentSubBinding = null;
                     }
 
-                    if (this._currentSubBindingSubscription != null)
+                    if (_currentSubBindingSubscription != null)
                     {
-                        this._currentSubBindingSubscription.Dispose();
-                        this._currentSubBindingSubscription = null;
+                        _currentSubBindingSubscription.Dispose();
+                        _currentSubBindingSubscription = null;
                     }
 
                     IMvxSourceBinding newSubBinding = null;
-                    if ((remainingTokens != null) && (remainingTokens.Count > 0))
+                    if (remainingTokens != null && remainingTokens.Count > 0)
                         newSubBinding = MvxSingleton<IMvxBindingSingletonCache>.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
 
-                    var subBindingObservable = (newSubBinding != null)
+                    var subBindingObservable = newSubBinding != null
                         ? Observable
                             .Return<object>(null)
                             .Concat(Observable
                                 .FromEventPattern(eh => newSubBinding.Changed += eh, eh => newSubBinding.Changed -= eh))
                             .Select(x => newSubBinding.GetValue())
-                            .Select(x => (x as IObservable<object>) ?? Observable.Return(x))
+                            .Select(x => x as IObservable<object> ?? Observable.Return(x))
                             .Switch()
                         : Observable.Return<object>(null);
 
-                    this._currentSubBinding = newSubBinding;
+                    _currentSubBinding = newSubBinding;
 
-                    this._currentSubBindingSubscription = subBindingObservable.Subscribe((value2 => 
+                    _currentSubBindingSubscription = subBindingObservable.Subscribe(value2 => 
                     {
-                        var changed2 = this.Changed;
-                        if (changed2 != null)
-                            changed2(this, EventArgs.Empty);
-                    }));
+                        Changed?.Invoke(this, EventArgs.Empty);
+                    });
                 });
         }
 
         public object GetValue()
         {
-            return this._currentSubBinding != null
-                ? this._currentSubBinding.GetValue()
-                : this._currentValue;
+            return _currentSubBinding != null
+                ? _currentSubBinding.GetValue()
+                : _currentValue;
         }
 
         public void SetValue(object value)
@@ -90,20 +82,16 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         public void Dispose()
         {
-            if (this._currentSubBinding != null)
-                this._currentSubBinding.Dispose();
-
-            if (this._currentSubBindingSubscription != null)
-                this._currentSubBindingSubscription.Dispose();
-
-            this._sourceSubscription.Dispose();
+            _currentSubBinding?.Dispose();
+            _currentSubBindingSubscription?.Dispose();
+            _sourceSubscription.Dispose();
         }
 
         public Type SourceType
         {
             get
             {
-                return this._currentSubBinding != null ? this._currentSubBinding.SourceType : this._sourceType;
+                return _currentSubBinding != null ? _currentSubBinding.SourceType : _sourceType;
             }
         }
     }
