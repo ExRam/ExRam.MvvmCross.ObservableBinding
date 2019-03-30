@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reactive.Linq;
 using System.Reflection;
 using MvvmCross.Base;
 using MvvmCross.Binding.Bindings.Source;
@@ -17,6 +18,8 @@ namespace ExRam.MvvmCross.ObservableBinding
         // ReSharper disable once NotAccessedField.Local
         private static readonly Type[] BindingTypes;
         private static readonly object[] EmptyObjectArray = new object[0];
+
+        internal static readonly IObservable<object> NullObservable = Observable.Return<object>(null);
 
         private static readonly ConcurrentDictionary<Type, Type> ImplementedObservableInterfaces = new ConcurrentDictionary<Type, Type>();
         private static readonly ConcurrentDictionary<Type, Func<object, Type, IMvxMainThreadAsyncDispatcher, List<MvxPropertyToken>, IMvxSourceBinding>> BindingFactories = new ConcurrentDictionary<Type, Func<object, Type, IMvxMainThreadAsyncDispatcher, List<MvxPropertyToken>, IMvxSourceBinding>>();

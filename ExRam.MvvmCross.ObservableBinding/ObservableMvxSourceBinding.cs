@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Linq;
 using MvvmCross.Base;
 using MvvmCross.Binding;
@@ -52,13 +53,17 @@ namespace ExRam.MvvmCross.ObservableBinding
 
                     var subBindingObservable = newSubBinding != null
                         ? Observable
-                            .Return<object>(null)
-                            .Concat(Observable
-                                .FromEventPattern(eh => newSubBinding.Changed += eh, eh => newSubBinding.Changed -= eh))
-                            .Select(x => newSubBinding.GetValue())
-                            .Select(x => x as IObservable<object> ?? Observable.Return(x))
+                            .FromEventPattern(
+                                eh => newSubBinding.Changed += eh,
+                                eh => newSubBinding.Changed -= eh)
+                            .StartWith(default(EventPattern<object>))
+                            .Select(_ =>
+                            {
+                                var bindingValue = newSubBinding.GetValue();
+                                return bindingValue as IObservable<object> ?? Observable.Return(bindingValue);
+                            })
                             .Switch()
-                        : Observable.Return<object>(null);
+                        : ObservableMvxPropertySourceBindingFactoryExtension.NullObservable;
 
                     _currentSubBinding = newSubBinding;
 
