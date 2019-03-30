@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq.Expressions;
 using System.Reactive.Linq;
+using System.Reflection;
 using MvvmCross.Base;
 using MvvmCross.Binding;
 using MvvmCross.Binding.Bindings.Source;

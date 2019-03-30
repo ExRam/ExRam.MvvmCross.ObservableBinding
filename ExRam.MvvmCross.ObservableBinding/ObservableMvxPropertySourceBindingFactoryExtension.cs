@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using MvvmCross.Base;
 using MvvmCross.Binding.Bindings.Source;
@@ -16,11 +18,14 @@ namespace ExRam.MvvmCross.ObservableBinding
         private static readonly Type[] BindingTypes;
         private static readonly object[] EmptyObjectArray = new object[0];
 
+        private static readonly ConcurrentDictionary<Type, Type> ImplementedObservableInterfaces = new ConcurrentDictionary<Type, Type>();
+        private static readonly ConcurrentDictionary<Type, Func<object, Type, IMvxMainThreadAsyncDispatcher, List<MvxPropertyToken>, IMvxSourceBinding>> BindingFactories = new ConcurrentDictionary<Type, Func<object, Type, IMvxMainThreadAsyncDispatcher, List<MvxPropertyToken>, IMvxSourceBinding>>();
+
         private readonly IMvxMainThreadAsyncDispatcher _mainThreadDispatcher;
         
         static ObservableMvxPropertySourceBindingFactoryExtension()
         {
-            ObservableMvxPropertySourceBindingFactoryExtension.BindingTypes = new[]
+            BindingTypes = new[]
             {
                 typeof(ObservableMvxSourceBinding<object>),
                 typeof(ObservableMvxSourceBinding<bool>),
@@ -48,7 +53,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         {
             Contract.Requires(mainThreadDispatcher != null);
 
-            this._mainThreadDispatcher = mainThreadDispatcher;
+            _mainThreadDispatcher = mainThreadDispatcher;
         }
 
         public bool TryCreateBinding(object source, MvxPropertyToken currentToken,
@@ -61,39 +66,42 @@ namespace ExRam.MvvmCross.ObservableBinding
 
                 if (currentToken is MvxEmptyPropertyToken)
                 {
-                    var observable = source as IObservable<object>;
-                    if (observable != null)
+                    if (source is IObservable<object> observable)
                     {
-                        result = new ObservableMvxSourceBinding<object>(observable, typeof(object), this._mainThreadDispatcher, remainingTokens);
+                        result = new ObservableMvxSourceBinding<object>(observable, typeof(object), _mainThreadDispatcher, remainingTokens);
+
                         return true;
                     }
 
-                    var implementedInterface = source
-                        .GetType()
-                        .GetTypeInfo()
-                        .ImplementedInterfaces
-                        .FirstOrDefault(iface => ((iface.IsConstructedGenericType) && (iface.GetGenericTypeDefinition() == typeof(IObservable<>))));
-                       
-                    if (implementedInterface != null)
-                        bindingSourceType = bindingTypeParameter = implementedInterface.GenericTypeArguments[0];
+                    bindingSourceType = bindingTypeParameter = ImplementedObservableInterfaces
+                        .GetOrAdd(
+                            source.GetType(),
+                            closureType => source
+                                .GetType()
+                                .GetTypeInfo()
+                                .ImplementedInterfaces
+                                .FirstOrDefault(iface => iface.IsConstructedGenericType && iface.GetGenericTypeDefinition() == typeof(IObservable<>))
+                                ?.GenericTypeArguments[0]);
                 }
                 else
                 {
-                    var propertyNameToken = currentToken as MvxPropertyNamePropertyToken;
-                    if (propertyNameToken != null)
+                    if (currentToken is MvxPropertyNamePropertyToken propertyNameToken)
                     {
-                        var propertyInfo = this.FindPropertyInfo(source, propertyNameToken.PropertyName);
+                        var propertyInfo = source
+                            .GetType()
+                            .GetRuntimeProperty(propertyNameToken.PropertyName);
+
                         if (propertyInfo != null)
                         {
                             var propertyTypeInfo = propertyInfo.PropertyType.GetTypeInfo();
-                            if ((propertyTypeInfo.IsGenericType) && (propertyTypeInfo.GetGenericTypeDefinition() == typeof(IObservable<>)))
+                            if (propertyTypeInfo.IsGenericType && propertyTypeInfo.GetGenericTypeDefinition() == typeof(IObservable<>))
                             {
-                                source = propertyInfo.GetValue(source, ObservableMvxPropertySourceBindingFactoryExtension.EmptyObjectArray);
+                                source = propertyInfo.GetValue(source, EmptyObjectArray);
 
                                 if (source != null)
                                 {
                                     bindingSourceType = propertyTypeInfo.GenericTypeArguments[0];
-                                    bindingTypeParameter = (bindingSourceType.GetTypeInfo().IsValueType)
+                                    bindingTypeParameter = bindingSourceType.GetTypeInfo().IsValueType
                                         ? bindingSourceType
                                         : typeof(object);
                                 }
@@ -104,29 +112,45 @@ namespace ExRam.MvvmCross.ObservableBinding
 
                 if (bindingTypeParameter != null)
                 {
-                    result = (IMvxSourceBinding)Activator.CreateInstance(
-                        typeof(ObservableMvxSourceBinding<>).MakeGenericType(bindingTypeParameter),
-                        source,
-                        bindingSourceType,
-                        this._mainThreadDispatcher,
-                        remainingTokens);
+                    var factory = BindingFactories.GetOrAdd(
+                        bindingTypeParameter,
+                        GetFactory);
+
+                    result = factory(source, bindingSourceType, _mainThreadDispatcher, remainingTokens);
 
                     return true;
                 }
             }
 
             result = null;
+
             return false;
         }
 
-        protected PropertyInfo FindPropertyInfo(object source, string name)
+        private static Func<object, Type, IMvxMainThreadAsyncDispatcher, List<MvxPropertyToken>, IMvxSourceBinding> GetFactory(Type type)
         {
-            Contract.Requires(source != null);
+            var constructor = typeof(ObservableMvxSourceBinding<>)
+                .MakeGenericType(type)
+                .GetConstructors()[0];
 
-            var propertyInfo = source.GetType()
-                .GetRuntimeProperty(name);
+            var arg1 = Expression.Parameter(typeof(object));
+            var arg2 = Expression.Parameter(typeof(Type));
+            var arg3 = Expression.Parameter(typeof(IMvxMainThreadAsyncDispatcher));
+            var arg4 = Expression.Parameter(typeof(List<MvxPropertyToken>));
 
-            return propertyInfo;
+            return Expression
+                .Lambda<Func<object, Type, IMvxMainThreadAsyncDispatcher, List<MvxPropertyToken>, IMvxSourceBinding>>(
+                    Expression.New(
+                        constructor,
+                        Expression.Convert(arg1, typeof(IObservable<>).MakeGenericType(type)),
+                        arg2,
+                        arg3,
+                        arg4),
+                    arg1,
+                    arg2,
+                    arg3,
+                    arg4)
+                .Compile();
         }
     }
 }
