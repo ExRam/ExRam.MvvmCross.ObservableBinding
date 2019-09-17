@@ -1,4 +1,5 @@
 ﻿using MvvmCross;
+using MvvmCross.IoC;
 using MvvmCross.Base;
 using MvvmCross.Binding.Bindings.Source.Construction;
 using MvvmCross.Plugin;
@@ -10,7 +11,7 @@ namespace ExRam.MvvmCross.ObservableBinding
     {
         public void Load()
         {
-            Mvx.CallbackWhenRegistered<IMvxSourceBindingFactoryExtensionHost>(host => host.Extensions.Insert(0, new ObservableMvxPropertySourceBindingFactoryExtension(Mvx.Resolve<IMvxMainThreadAsyncDispatcher>())));
+            Mvx.IoCProvider.CallbackWhenRegistered<IMvxSourceBindingFactoryExtensionHost>(host => host.Extensions.Insert(0, new ObservableMvxPropertySourceBindingFactoryExtension(Mvx.IoCProvider.Resolve<IMvxMainThreadAsyncDispatcher>())));
         }
     }
 }
