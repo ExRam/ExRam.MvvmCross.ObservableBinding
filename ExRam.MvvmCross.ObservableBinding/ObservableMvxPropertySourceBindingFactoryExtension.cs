@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
@@ -54,8 +53,6 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         public ObservableMvxPropertySourceBindingFactoryExtension(IMvxMainThreadAsyncDispatcher mainThreadDispatcher)
         {
-            Contract.Requires(mainThreadDispatcher != null);
-
             _mainThreadDispatcher = mainThreadDispatcher;
         }
 
