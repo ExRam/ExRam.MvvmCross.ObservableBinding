@@ -90,8 +90,8 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         public void OnNext(object value) => Changed?.Invoke(this, EventArgs.Empty);
 
-        public Type SourceType => _currentSubBinding != null
-            ? _currentSubBinding.SourceType
+        public Type SourceType => _currentSubBinding is { } currentSubBinding
+            ? currentSubBinding.SourceType
             : _sourceType;
     }
 }
