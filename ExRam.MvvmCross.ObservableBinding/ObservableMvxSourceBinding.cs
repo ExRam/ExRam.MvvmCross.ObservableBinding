@@ -35,42 +35,34 @@ namespace ExRam.MvvmCross.ObservableBinding
                 {
                     _currentValue = value;
 
-                    if (_currentSubBinding != null)
+                    var subBinding = (remainingTokens != null && remainingTokens.Count > 0)
+                        ? MvxSingleton<IMvxBindingSingletonCache>.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens)
+                        : null;
+
+                    if (subBinding != null)
                     {
-                        _currentSubBinding.Dispose();
-                        _currentSubBinding = null;
-                    }
+                        _currentSubBinding?.Dispose();
+                        _currentSubBindingSubscription?.Dispose();
 
-                    if (_currentSubBindingSubscription != null)
-                    {
-                        _currentSubBindingSubscription.Dispose();
-                        _currentSubBindingSubscription = null;
-                    }
-
-                    IMvxSourceBinding newSubBinding = null;
-                    if (remainingTokens != null && remainingTokens.Count > 0)
-                        newSubBinding = MvxSingleton<IMvxBindingSingletonCache>.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens);
-
-                    var subBindingObservable = newSubBinding != null
-                        ? Observable
+                        _currentSubBinding = subBinding;
+                        _currentSubBindingSubscription = Observable
                             .FromEventPattern(
-                                eh => newSubBinding.Changed += eh,
-                                eh => newSubBinding.Changed -= eh)
+                                eh => subBinding.Changed += eh,
+                                eh => subBinding.Changed -= eh)
                             .StartWith(default(EventPattern<object>))
                             .Select(_ =>
                             {
-                                var bindingValue = newSubBinding.GetValue();
+                                var bindingValue = subBinding.GetValue();
                                 return bindingValue as IObservable<object> ?? Observable.Return(bindingValue);
                             })
                             .Switch()
-                        : ObservableMvxPropertySourceBindingFactoryExtension.NullObservable;
-
-                    _currentSubBinding = newSubBinding;
-
-                    _currentSubBindingSubscription = subBindingObservable.Subscribe(value2 => 
-                    {
+                            .Subscribe(_ =>
+                            {
+                                Changed?.Invoke(this, EventArgs.Empty);
+                            });
+                    }
+                    else
                         Changed?.Invoke(this, EventArgs.Empty);
-                    });
                 });
         }
 
