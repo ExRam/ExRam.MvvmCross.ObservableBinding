@@ -16,8 +16,8 @@ namespace ExRam.MvvmCross.ObservableBinding
     {
         public event EventHandler Changed;
 
-        private readonly IDisposable _sourceSubscription;
         private readonly Type _sourceType;
+        private readonly IDisposable _sourceSubscription;
 
         private T _currentValue;
         private IMvxSourceBinding _currentSubBinding;
@@ -27,6 +27,8 @@ namespace ExRam.MvvmCross.ObservableBinding
         {
             _sourceType = sourceType;
 
+            var sourceBindingFactory = MvxSingleton<IMvxBindingSingletonCache>.Instance.SourceBindingFactory;
+
             if (mainThreadDispatcher != null)
                 source = source.ObserveOn(mainThreadDispatcher);
 
@@ -35,16 +37,14 @@ namespace ExRam.MvvmCross.ObservableBinding
                 {
                     _currentValue = value;
 
-                    var subBinding = (remainingTokens != null && remainingTokens.Count > 0)
-                        ? MvxSingleton<IMvxBindingSingletonCache>.Instance.SourceBindingFactory.CreateBinding(value, remainingTokens)
-                        : null;
-
-                    if (subBinding != null)
+                    if (remainingTokens != null && remainingTokens.Count > 0)
                     {
                         _currentSubBinding?.Dispose();
                         _currentSubBindingSubscription?.Dispose();
 
-                        _currentSubBinding = subBinding;
+                        var subBinding = _currentSubBinding = sourceBindingFactory
+                            .CreateBinding(value, remainingTokens);
+
                         _currentSubBindingSubscription = Observable
                             .FromEventPattern(
                                 eh => subBinding.Changed += eh,
@@ -66,12 +66,9 @@ namespace ExRam.MvvmCross.ObservableBinding
                 });
         }
 
-        public object GetValue()
-        {
-            return _currentSubBinding != null
-                ? _currentSubBinding.GetValue()
-                : _currentValue;
-        }
+        public object GetValue() => _currentSubBinding is { } currentSubBinding
+            ? currentSubBinding.GetValue()
+            : _currentValue;
 
         public void SetValue(object value)
         {
@@ -84,12 +81,6 @@ namespace ExRam.MvvmCross.ObservableBinding
             _sourceSubscription.Dispose();
         }
 
-        public Type SourceType
-        {
-            get
-            {
-                return _currentSubBinding != null ? _currentSubBinding.SourceType : _sourceType;
-            }
-        }
+        public Type SourceType => _currentSubBinding != null ? _currentSubBinding.SourceType : _sourceType;
     }
 }
