@@ -56,8 +56,7 @@ namespace ExRam.MvvmCross.ObservableBinding
             _mainThreadDispatcher = mainThreadDispatcher;
         }
 
-        public bool TryCreateBinding(object source, MvxPropertyToken currentToken,
-                                     List<MvxPropertyToken> remainingTokens, out IMvxSourceBinding result)
+        public bool TryCreateBinding(object source, MvxPropertyToken currentToken, List<MvxPropertyToken> remainingTokens, out IMvxSourceBinding result)
         {
             if (source != null)
             {
