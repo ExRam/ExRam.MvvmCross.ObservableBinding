@@ -12,7 +12,7 @@ using MvvmCross.Binding.Parse.PropertyPath.PropertyTokens;
 
 namespace ExRam.MvvmCross.ObservableBinding
 {
-    internal sealed class ObservableMvxSourceBinding<T> : IMvxSourceBinding
+    internal sealed class ObservableMvxSourceBinding<T> : IMvxSourceBinding, IObserver<object>
     {
         public event EventHandler Changed;
 
@@ -56,13 +56,10 @@ namespace ExRam.MvvmCross.ObservableBinding
                                 return bindingValue as IObservable<object> ?? Observable.Return(bindingValue);
                             })
                             .Switch()
-                            .Subscribe(_ =>
-                            {
-                                Changed?.Invoke(this, EventArgs.Empty);
-                            });
+                            .Subscribe(this);
                     }
                     else
-                        Changed?.Invoke(this, EventArgs.Empty);
+                        OnNext(null);
                 });
         }
 
@@ -76,11 +73,25 @@ namespace ExRam.MvvmCross.ObservableBinding
 
         public void Dispose()
         {
-            _currentSubBinding?.Dispose();
-            _currentSubBindingSubscription?.Dispose();
-            _sourceSubscription.Dispose();
+            using (_sourceSubscription)
+            {
+                _currentSubBinding?.Dispose();
+                _currentSubBindingSubscription?.Dispose();
+            }
         }
 
-        public Type SourceType => _currentSubBinding != null ? _currentSubBinding.SourceType : _sourceType;
+        public void OnCompleted()
+        {
+        }
+
+        public void OnError(Exception error)
+        {
+        }
+
+        public void OnNext(object value) => Changed?.Invoke(this, EventArgs.Empty);
+
+        public Type SourceType => _currentSubBinding != null
+            ? _currentSubBinding.SourceType
+            : _sourceType;
     }
 }
