@@ -21,7 +21,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         internal static readonly IObservable<object> NullObservable = Observable.Return<object>(null);
 
         private static readonly ConcurrentDictionary<Type, Type> ImplementedObservableInterfaces = new ConcurrentDictionary<Type, Type>();
-        private static readonly ConcurrentDictionary<Type, Func<object, Type, IMvxMainThreadAsyncDispatcher, List<MvxPropertyToken>, IMvxSourceBinding>> BindingFactories = new ConcurrentDictionary<Type, Func<object, Type, IMvxMainThreadAsyncDispatcher, List<MvxPropertyToken>, IMvxSourceBinding>>();
+        private static readonly ConcurrentDictionary<Type, Func<object, Type, IMvxMainThreadAsyncDispatcher, List<IMvxPropertyToken>, IMvxSourceBinding>> BindingFactories = new ConcurrentDictionary<Type, Func<object, Type, IMvxMainThreadAsyncDispatcher, List<IMvxPropertyToken>, IMvxSourceBinding>>();
 
         private readonly IMvxMainThreadAsyncDispatcher _mainThreadDispatcher;
         
@@ -56,7 +56,7 @@ namespace ExRam.MvvmCross.ObservableBinding
             _mainThreadDispatcher = mainThreadDispatcher;
         }
 
-        public bool TryCreateBinding(object source, MvxPropertyToken currentToken, List<MvxPropertyToken> remainingTokens, out IMvxSourceBinding result)
+        public bool TryCreateBinding(object source, IMvxPropertyToken currentToken, List<IMvxPropertyToken> remainingTokens, out IMvxSourceBinding result)
         {
             if (source != null)
             {
@@ -126,7 +126,7 @@ namespace ExRam.MvvmCross.ObservableBinding
             return false;
         }
 
-        private static Func<object, Type, IMvxMainThreadAsyncDispatcher, List<MvxPropertyToken>, IMvxSourceBinding> GetFactory(Type type)
+        private static Func<object, Type, IMvxMainThreadAsyncDispatcher, List<IMvxPropertyToken>, IMvxSourceBinding> GetFactory(Type type)
         {
             var constructor = typeof(ObservableMvxSourceBinding<>)
                 .MakeGenericType(type)
@@ -135,10 +135,10 @@ namespace ExRam.MvvmCross.ObservableBinding
             var arg1 = Expression.Parameter(typeof(object));
             var arg2 = Expression.Parameter(typeof(Type));
             var arg3 = Expression.Parameter(typeof(IMvxMainThreadAsyncDispatcher));
-            var arg4 = Expression.Parameter(typeof(List<MvxPropertyToken>));
+            var arg4 = Expression.Parameter(typeof(List<IMvxPropertyToken>));
 
             return Expression
-                .Lambda<Func<object, Type, IMvxMainThreadAsyncDispatcher, List<MvxPropertyToken>, IMvxSourceBinding>>(
+                .Lambda<Func<object, Type, IMvxMainThreadAsyncDispatcher, List<IMvxPropertyToken>, IMvxSourceBinding>>(
                     Expression.New(
                         constructor,
                         Expression.Convert(arg1, typeof(IObservable<>).MakeGenericType(type)),
