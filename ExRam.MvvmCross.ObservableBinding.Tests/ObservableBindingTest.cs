@@ -1,4 +1,4 @@
-﻿// ExRam.MvvmCross.ObservableBinding (c) ExRam GmbH & Co. KG http://www.exram.de
+// ExRam.MvvmCross.ObservableBinding (c) ExRam GmbH & Co. KG http://www.exram.de
 // ExRam.MvvmCross.ObservableBinding is licensed using Microsoft Public License (Ms-PL)
 
 using System;
@@ -170,7 +170,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         [Fact]
         public void Binding_to_Foo_StringObservable_succeeds()
         {
-            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "StringObservable");
 
             Assert.Equal(typeof(string), binding.SourceType);
@@ -180,7 +180,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         [Fact]
         public void Binding_directly_to_observable_succeeds()
         {
-            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(Observable.Return("Hello"), "");
 
             Assert.Equal(typeof(object), binding.SourceType);
@@ -190,7 +190,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         [Fact]
         public void Binding_directly_to_valuetype_observable_succeeds()
         {
-            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(Observable.Return(true), "");
 
             Assert.Equal(typeof(bool), binding.SourceType);
@@ -215,7 +215,7 @@ namespace ExRam.MvvmCross.ObservableBinding
                     return disposableMock.Object;
                 });
 
-            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
             using (var binding = factory.CreateBinding(observable, ""))
             {
                 Assert.NotNull(disposableMock);
@@ -232,7 +232,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         [Fact]
         public void Binding_to_Foo_BoolObservable_succeeds()
         {
-            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "BoolObservable");
 
             Assert.Equal(typeof(bool), binding.SourceType);
@@ -243,7 +243,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         [Fact]
         public void Binding_to_Foo_BoxedBoolObservable_succeeds()
         {
-            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "BoxedBoolObservable");
 
             Assert.Equal(typeof(object), binding.SourceType);
@@ -254,7 +254,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         [Fact]
         public void Binding_to_Foo_NestedBarObservable_succeeds()
         {
-            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
             using (var binding = factory.CreateBinding(new Foo(), "NestedBarObservable.BarProperty"))
             {
                 Assert.Equal(typeof(string), binding.SourceType);
@@ -265,7 +265,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         [Fact]
         public async Task Binding_to_Foo_NestedBarObservable_produces_correct_values()
         {
-            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "NestedBarObservable.StringObservable");
 
             Assert.Equal(typeof(string), binding.SourceType);
@@ -285,7 +285,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         [Fact]
         public async Task Binding_to_Foo_DynamicNestedBarObservable_Value_produces_correct_values()
         {
-            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "DynamicNestedBarObservable.Value");
 
             var array = await Observable.FromEventPattern<EventHandler, EventArgs>(eh => binding.Changed += eh, eh => binding.Changed -= eh)
@@ -303,7 +303,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         [Fact]
         public void SetValue_does_nothing()
         {
-            var factory = Mvx.Resolve<IMvxSourceBindingFactory>();
+            var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
             var binding = factory.CreateBinding(new Foo(), "DynamicNestedBarObservable.Value");
 
             binding.SetValue("Some value");

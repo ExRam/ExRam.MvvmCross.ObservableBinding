@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MvvmCross" Version="9.4.0" />
+    <PackageReference Include="MvvmCross" Version="10.1.2" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 
