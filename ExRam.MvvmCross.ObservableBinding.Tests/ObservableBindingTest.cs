@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Moq;
+using NSubstitute;
 using MvvmCross;
 using MvvmCross.Binding;
 using MvvmCross.Binding.Bindings.Source.Construction;
@@ -200,7 +200,7 @@ namespace ExRam.MvvmCross.ObservableBinding
         [Fact]
         public void Disposing_the_binding_unsubscribes_from_source()
         {
-            Mock<IDisposable> disposableMock = null;
+            IDisposable disposableMock = null;
 
             var observable = Observable
                 .Create<string>(obs =>
@@ -209,10 +209,10 @@ namespace ExRam.MvvmCross.ObservableBinding
                         .Return("Hello").Concat(Observable.Never<string>())
                         .Subscribe(obs);
 
-                    disposableMock = new Mock<IDisposable>();
-                    disposableMock.Setup(x => x.Dispose()).Callback(subscription.Dispose);
+                    disposableMock = Substitute.For<IDisposable>();
+                    disposableMock.When(x => x.Dispose()).Do(_ => subscription.Dispose());
 
-                    return disposableMock.Object;
+                    return disposableMock;
                 });
 
             var factory = Mvx.IoCProvider.Resolve<IMvxSourceBindingFactory>();
@@ -223,10 +223,10 @@ namespace ExRam.MvvmCross.ObservableBinding
                 Assert.Equal(typeof(object), binding.SourceType);
                 Assert.Equal("Hello", binding.GetValue());
 
-                disposableMock.Verify(x => x.Dispose(), Times.Never());
+                disposableMock.DidNotReceive().Dispose();
             }
 
-            disposableMock.Verify(x => x.Dispose(), Times.Once());
+            disposableMock.Received(1).Dispose();
         }
 
         [Fact]
